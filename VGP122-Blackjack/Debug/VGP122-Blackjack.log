@@ -1,4 +1,3 @@
 ﻿  Game.cpp
-h:\vgp122-blackjack\vgp122-blackjack\gamemanager.h(18): warning C4091: 'static ': ignored on left of 'GameManager::GAMESTATUS' when no variable is declared
   VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.exe
   VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.pdb (Partial PDB)
