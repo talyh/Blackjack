@@ -4,22 +4,30 @@
 #include <iomanip>
 #include <vector>
 #include <random>
-#include "GameManager.h"
+#include "GameController.h"
 #include "Instructions.h"
+#include "Match.h"
+#include "Player.h"
+#include "Dealer.h"
 
 using namespace std;
 
 void ShowOptions();
-void GetOption();
+void GetOption(Match);
 
-GameManager match; // TODO QUESTION which access level this should have?
+GameController gameController;
+// TODO QUESTION why couldn't define inside main?
 
 void main()
 {
-		while (match.GetGameStatus() == GameManager::notStarted)
+	Match match = gameController.getMatch();
+	Player player = gameController.getPlayer();
+	Dealer dealer = gameController.getDealer();
+	
+	while (match.GetGameStatus() == Match::notStarted)
 	{
 		ShowOptions();
-		GetOption();
+		GetOption(match);
 	}
 }
 
@@ -33,7 +41,7 @@ void ShowOptions()
 	cout << "----------------------------------------------" << endl;
 }
 
-void GetOption()
+void GetOption(Match match)
 {
 	int option{ 0 };
 	while (option < 1 || option > 3)

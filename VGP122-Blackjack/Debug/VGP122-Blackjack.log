@@ -1,3 +1,7 @@
-﻿  Game.cpp
+﻿  Player.cpp
+h:\vgp122-blackjack\vgp122-blackjack\player.cpp(7): warning C4102: 'match': unreferenced label
+  Game.cpp
+  Generating Code...
+h:\vgp122-blackjack\vgp122-blackjack\player.cpp(9): warning C4717: 'Player::Bet': recursive on all control paths, function will cause runtime stack overflow
   VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.exe
   VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.pdb (Partial PDB)

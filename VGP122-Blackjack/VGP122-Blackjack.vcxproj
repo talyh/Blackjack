@@ -114,13 +114,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Card.h" />
+    <ClInclude Include="Dealer.h" />
     <ClInclude Include="Deck.h" />
-    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameController.h" />
+    <ClInclude Include="Match.h" />
     <ClInclude Include="Instructions.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Card.cpp" />
+    <ClCompile Include="Dealer.cpp" />
+    <ClCompile Include="Deck.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameController.cpp" />
     <ClCompile Include="Instructions.cpp" />
+    <ClCompile Include="Match.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
