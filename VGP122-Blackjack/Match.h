@@ -1,5 +1,7 @@
-#include <vector>
+#include "Common.h"
 #include "Deck.h"
+#include "Player.h"
+#include "Dealer.h"
 
 #ifndef MATCH_H
 #define  MATCH_H
@@ -13,11 +15,15 @@ public:
 
 	void StartGame();
 
-	void StartRound();
+	void PlayRound();
 
-	void DealCard();
+	int DealCard();
 
-	void PlaceBet(int credits);
+	void GetBet();
+
+	void Bet(int bet);
+
+	void GetPlay();
 
 	void Split();
 
@@ -37,6 +43,8 @@ private:
 	std::vector<int> bets;	// to store the bets in play
 							// 0 represents the player's basic bet
 							// 1 represents an additional bet from a Split
+	Player player;
+	Dealer dealer;
 };
 
 #endif

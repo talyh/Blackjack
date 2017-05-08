@@ -1,33 +1,22 @@
-#include <iostream>
-#include <array>
-#include <string>
-#include <iomanip>
-#include <vector>
-#include <random>
-#include "GameController.h"
+#include "Common.h"
 #include "Instructions.h"
 #include "Match.h"
-#include "Player.h"
-#include "Dealer.h"
 
 using namespace std;
 
 void ShowOptions();
-void GetOption(Match);
+void GetOption();
 
-GameController gameController;
-// TODO QUESTION why couldn't define inside main?
+Match match;
 
 void main()
 {
-	Match match = gameController.getMatch();
-	Player player = gameController.getPlayer();
-	Dealer dealer = gameController.getDealer();
+
 	
 	while (match.GetGameStatus() == Match::notStarted)
 	{
 		ShowOptions();
-		GetOption(match);
+		GetOption();
 	}
 }
 
@@ -41,7 +30,7 @@ void ShowOptions()
 	cout << "----------------------------------------------" << endl;
 }
 
-void GetOption(Match match)
+void GetOption()
 {
 	int option{ 0 };
 	while (option < 1 || option > 3)
@@ -67,8 +56,7 @@ void GetOption(Match match)
 			default:
 			{
 				cout << "Option invalid. Please enter (1), (2) or (3)." << endl;
-				cin.clear();
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				Common::FlushInput();
 				break;
 			}
 		}

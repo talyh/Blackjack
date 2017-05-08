@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Match.h"
 
 int Match::GetGameStatus()
@@ -11,33 +10,72 @@ void Match::StartGame()
 	system("cls");
 	gameStatus = running;
 	deck.Shuffle(SHUFFLES);
-	StartRound();
+	PlayRound();
 }
 
-void Match::StartRound()
+void Match::PlayRound()
+{
+	bets.push_back(0);
+	GetBet();
+	int selected = DealCard();
+	std::cout << "Hand: " << selected << std::endl;
+	GetPlay();
+
+}
+
+int Match::DealCard() {
+	//std::cout << "selected: " << selected << std::endl;
+	return deck.GetCard();
+}
+
+void Match::GetBet()
 {
 	std::cout << "Enter the amount you'd like to bet" << std::endl;
-	std::cin >> bets[0];
-	player.Bet();
-	DealCard();
+
+	if (std::cin >> bets[0])
+	{
+		Bet(bets[0]);
+	}
+	else
+	{
+		std::cout << "Invalid bet." << std::endl;
+		Common::FlushInput();
+		GetBet();
+	}
 }
 
-void Match::DealCard() {
-	int selected = deck.GetCard();
-	//std::cout << "selected: " << selected << std::endl;
-}
-
-void Match::PlaceBet(int credits)
+void Match::Bet(int credits)
 {
 	// TODO need to acd credit limit check on Player
-	bets.push_back(credits);
+	if (player.Bet(credits) > 0)
+	{
+		bets[0] = credits;
+		std::cout << "Betting " << bets[0] << std::endl;
+	}
+	else
+	{
+		std::cout << "Insuficient credits." << std::endl;
+		GetBet();
+	}
+}
+
+void Match::GetPlay()
+{
+	std::cout << "Please enter an option" << std::endl;
 }
 
 void Match::Split()
 {
 	// TODO need to acd credit limit check on Player
-	bets[0] *= 2;
-	bets.push_back(bets[0]);
+	if (player.Split(bets[0]) > 0)
+	{
+		bets[0] *= 2;
+		bets.push_back(bets[0]);
+	}
+	else
+	{
+		std::cout << "Insuficient credits to split. Please choose another play." << std::endl;
+	}
 }
 
 void Match::FinishRound()
