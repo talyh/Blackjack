@@ -6,16 +6,7 @@
 
 class Deck {
 public:
-	Deck() :
-		cards(52)
-	{
-		for (size_t i{0}; i < cards.size(); i++)
-		{
-			cards[i].face = (Card::FACES)(i % 13);
-			cards[i].suit = (Card::SUITS)(i / 13);
-			cards[i].SetFaceValue(cards[i].face);
-		}
-	}
+	Deck();
 	
 	void Shuffle(size_t shuffles);
 	

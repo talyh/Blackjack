@@ -4,6 +4,7 @@
 #include <vector>
 #include <random>
 #include <array>
+#include <cstdlib>
 
 using namespace std;
 

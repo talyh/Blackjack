@@ -1,3 +1,3 @@
-﻿  Card.cpp
-Card.obj : error LNK2001: unresolved external symbol "private: static class std::map<enum Card::FACES,class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,struct std::less<enum Card::FACES>,class std::allocator<struct std::pair<enum Card::FACES const ,class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > > > > Card::facesString" (?facesString@Card@@0V?$map@W4FACES@Card@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@U?$less@W4FACES@Card@@@4@V?$allocator@U?$pair@$$CBW4FACES@Card@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@std@@@4@@std@@A)
-H:\VGP122-Blackjack\Debug\VGP122-Blackjack.exe : fatal error LNK1120: 1 unresolved externals
+﻿  Match.cpp
+  VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.exe
+  VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.pdb (Partial PDB)

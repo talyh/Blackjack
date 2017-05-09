@@ -9,10 +9,8 @@ void Match::StartGame()
 {
 	system("cls");
 	gameStatus = running;
-	deck.TEMP_ShowDeck();
-
-	//deck.Shuffle(SHUFFLES);
-	//PlayRound();
+	deck.Shuffle(SHUFFLES);
+	PlayRound();
 }
 
 void Match::PlayRound()
@@ -20,7 +18,8 @@ void Match::PlayRound()
 	bets.push_back(0);
 	GetBet();
 	Card selected = DealCard();
-	//std::cout << "Hand: " << selected << std::endl;
+	std::cout << "Hand: ";
+	selected.ViewCard();
 	GetPlay();
 
 }
