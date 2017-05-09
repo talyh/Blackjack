@@ -15,6 +15,6 @@ public:
 	void TEMP_ShowDeck();
 
 private:
-	std::vector<Card> cards;
+	vector<Card> cards;
 };
 #endif

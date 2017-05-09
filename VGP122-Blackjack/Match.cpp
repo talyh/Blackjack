@@ -17,29 +17,35 @@ void Match::PlayRound()
 {
 	bets.push_back(0);
 	GetBet();
-	Card selected = DealCard();
-	std::cout << "Hand: ";
-	selected.ViewCard();
+	Card selected = GetCard();
+	DealCard(selected);
+	cout << "Hand: ";
+	player.ViewHands();
+	cout << endl;
 	GetPlay();
 
 }
 
-Card Match::DealCard() {
-	//std::cout << "selected: " << selected << std::endl;
+Card Match::GetCard() {
 	return deck.GetCard();
+}
+
+void Match::DealCard(Card card)
+{
+	player.GetCard(card);
 }
 
 void Match::GetBet()
 {
-	std::cout << "Enter the amount you'd like to bet" << std::endl;
+	cout << "Enter the amount you'd like to bet" << endl;
 
-	if (std::cin >> bets[0])
+	if (cin >> bets[0])
 	{
 		Bet(bets[0]);
 	}
 	else
 	{
-		std::cout << "Invalid bet." << std::endl;
+		cout << "Invalid bet." << endl;
 		Common::FlushInput();
 		GetBet();
 	}
@@ -51,18 +57,18 @@ void Match::Bet(int credits)
 	if (player.Bet(credits) > 0)
 	{
 		bets[0] = credits;
-		std::cout << "Betting " << bets[0] << std::endl;
+		cout << "Betting " << bets[0] << endl;
 	}
 	else
 	{
-		std::cout << "Insuficient credits." << std::endl;
+		cout << "Insuficient credits." << endl;
 		GetBet();
 	}
 }
 
 void Match::GetPlay()
 {
-	std::cout << "Please enter an option" << std::endl;
+	cout << "Please enter an option" << endl;
 }
 
 void Match::Split()
@@ -75,7 +81,7 @@ void Match::Split()
 	}
 	else
 	{
-		std::cout << "Insuficient credits to split. Please choose another play." << std::endl;
+		cout << "Insuficient credits to split. Please choose another play." << endl;
 	}
 }
 
@@ -91,7 +97,7 @@ void Match::TEMP_ShowBets()
 	int i{ 0 };
 	for (int bet : bets)
 	{
-		std::cout << i++ << ". " << bet << std::endl;
+		cout << i++ << ". " << bet << endl;
 	}
 }
 

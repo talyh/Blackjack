@@ -17,7 +17,9 @@ public:
 
 	void PlayRound();
 
-	Card DealCard();
+	Card GetCard();
+
+	void DealCard(Card card);
 
 	void GetBet();
 
