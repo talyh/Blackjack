@@ -1,9 +1,11 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
-#include <iostream>
 #include <vector>
 #include <random>
+#include <array>
+
+using namespace std;
 
 #ifndef COMMON_H
 #define COMMON_H
