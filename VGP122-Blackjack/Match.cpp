@@ -1,5 +1,23 @@
 #include "Match.h"
 
+Match::Match() : gameStatus{ notStarted } { 
+	/*cout << "dealer address: " << &dealer << endl;
+	
+	Dealer* dealers[2];
+	
+	dealers[0] = &dealer;
+	cout << "dealers[0] address: " << &dealers << endl;
+
+	Dealer* dealerPtr = &dealer;
+	cout << "dealerPtr address: " << dealerPtr << endl;
+
+	dealers[0] = dealerPtr;
+	cout << "dealers[0] address: " << &dealers << endl;*/
+
+
+	
+	players[0] = &dealer; players[1] = &player; }
+
 int Match::GetGameStatus()
 {
 	return gameStatus;
@@ -17,28 +35,32 @@ void Match::PlayRound()
 {
 	bets.push_back(0);
 	GetBet();
-	DealInitialHand();
-	cout << "Hand: ";
+	DealInitialHands();
+	cout << "Dealer's Hand: " << endl;
+	dealer.ViewHands();
+	cout << "Your Hand: " << endl;
 	player.ViewHands();
 	cout << endl;
 	GetPlay();
-
 }
 
 Card Match::GetCard() {
 	return deck.GetCard();
 }
 
-void Match::DealCard(Card card)
+void Match::DealCard(Card card, Player* currentPlayer)
 {
-	player.GetCard(card);
+	currentPlayer->GetCard(card);
 }
 
-void Match::DealInitialHand()
+void Match::DealInitialHands()
 {
-	for (size_t i{ 0 }; i < Player::INITIAL_HAND_SIZE; i++)
+	for (size_t i{ 0 }; i < players.size(); i++)
 	{
-		DealCard(GetCard());
+		for (size_t j{ 0 }; j < players[i]->INITIAL_HAND_SIZE; j++)
+		{
+			DealCard(GetCard(), players[i]);
+		}
 	}
 }
 
@@ -60,7 +82,6 @@ void Match::GetBet()
 
 void Match::Bet(int credits)
 {
-	// TODO need to acd credit limit check on Player
 	if (player.Bet(credits) > 0)
 	{
 		bets[0] = credits;
@@ -80,7 +101,6 @@ void Match::GetPlay()
 
 void Match::Split()
 {
-	// TODO need to acd credit limit check on Player
 	if (player.Split(bets[0]) > 0)
 	{
 		bets[0] *= 2;

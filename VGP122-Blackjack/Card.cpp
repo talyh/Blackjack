@@ -12,7 +12,7 @@ void Card::SetSuit(string suit)
 
 void Card::SetFaceValue(string face)
 {
-	faceValue = face == "A" ? 0 : (face == "J" || face == "Q" || face == "K") ? 10 : stoi(face);
+	faceValue = face == "A" ? 11 : (face == "J" || face == "Q" || face == "K") ? 10 : stoi(face);
 }
 
 string Card::GetFace()

@@ -1,6 +1,6 @@
 #include "Human.h"
 
-Human::Human() : credits{ Human::INITIAL_CREDITS } {}
+Human::Human() : credits{ Human::INITIAL_CREDITS } { Player::TEMPname = 'h'; }
 
 int Human::Bet(int bet)
 {

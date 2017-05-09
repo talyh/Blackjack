@@ -14,7 +14,7 @@ public:
 	int Split(int bet);	// return bet if the player has sufficient credits to place the bet
 						// returns 0 if the player doesn't have sufficient credits
 
-	static const int INITIAL_CREDITS{500};
+	static const int INITIAL_CREDITS{ 500 };
 
 private:
 	int credits;

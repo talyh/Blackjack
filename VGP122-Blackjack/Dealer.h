@@ -5,7 +5,8 @@
 
 class Dealer : public Player
 {
-
+public:
+	Dealer()  {Player::TEMPname = 'd'; }
 };
 
 #endif // !DEALER_H
