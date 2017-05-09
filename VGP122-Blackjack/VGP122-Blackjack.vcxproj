@@ -118,6 +118,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="Dealer.h" />
     <ClInclude Include="Deck.h" />
+    <ClInclude Include="Human.h" />
     <ClInclude Include="Match.h" />
     <ClInclude Include="Instructions.h" />
     <ClInclude Include="Player.h" />
@@ -127,6 +128,7 @@
     <ClCompile Include="Dealer.cpp" />
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Human.cpp" />
     <ClCompile Include="Instructions.cpp" />
     <ClCompile Include="Match.cpp" />
     <ClCompile Include="Player.cpp" />

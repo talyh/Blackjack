@@ -17,8 +17,7 @@ void Match::PlayRound()
 {
 	bets.push_back(0);
 	GetBet();
-	Card selected = GetCard();
-	DealCard(selected);
+	DealInitialHand();
 	cout << "Hand: ";
 	player.ViewHands();
 	cout << endl;
@@ -33,6 +32,14 @@ Card Match::GetCard() {
 void Match::DealCard(Card card)
 {
 	player.GetCard(card);
+}
+
+void Match::DealInitialHand()
+{
+	for (size_t i{ 0 }; i < Player::INITIAL_HAND_SIZE; i++)
+	{
+		DealCard(GetCard());
+	}
 }
 
 void Match::GetBet()

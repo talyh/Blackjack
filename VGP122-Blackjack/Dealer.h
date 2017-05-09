@@ -1,9 +1,12 @@
-#include "Common.h"
+#include "Player.h"
 
 #ifndef DEALER_H
 #define DEALER_H
 
-class Dealer {};
+class Dealer : public Player
+{
+
+};
 
 #endif // !DEALER_H
 

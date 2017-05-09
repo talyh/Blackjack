@@ -2,6 +2,7 @@
 #include "Deck.h"
 #include "Player.h"
 #include "Dealer.h"
+#include "Human.h"
 
 #ifndef MATCH_H
 #define  MATCH_H
@@ -20,6 +21,8 @@ public:
 	Card GetCard();
 
 	void DealCard(Card card);
+
+	void DealInitialHand();
 
 	void GetBet();
 
@@ -45,7 +48,7 @@ private:
 	std::vector<int> bets;	// to store the bets in play
 							// 0 represents the player's basic bet
 							// 1 represents an additional bet from a Split
-	Player player;
+	Human player;
 	Dealer dealer;
 };
 

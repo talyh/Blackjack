@@ -1,33 +1,6 @@
 #include "Player.h"
 
-Player::Player() : hands(1), credits{Player::INITIALCREDITS}
-{
-}
-
-int Player::Bet(int bet)
-{
-	if (credits >= bet)
-	{
-		credits -= bet;
-		return bet;
-	}
-	else
-		return 0;
-}
-
-int Player::Split(int bet)
-{
-	if (credits >= bet * 2)
-	{
-		credits -= bet;
-		return bet;
-	}
-	else
-	{
-		return 0;
-	}
-
-}
+Player::Player() : hands(Player::INITIAL_HANDS) {}
 
 void Player::GetCard(Card card, int hand)
 {

@@ -9,21 +9,14 @@ class Player
 public:
 	Player();
 
-	int Bet(int bet);	// return bet if the player has sufficient credits to place the bet
-						// returns 0 if the player doesn't have sufficient credits
-
-	int Split(int bet);	// return bet if the player has sufficient credits to place the bet
-						// returns 0 if the player doesn't have sufficient credits
-
 	void GetCard(Card card, int hand = 0);
 
 	void ViewHands();
 
-	static const int INITIALCREDITS = 500;
-
+	static const int INITIAL_HANDS{ 1 };
+	static const int INITIAL_HAND_SIZE{ 2 };
 private:
 	vector<vector<Card>> hands;
-	int credits;
 };
 
 #endif
