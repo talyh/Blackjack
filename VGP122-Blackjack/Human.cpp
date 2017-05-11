@@ -18,16 +18,16 @@ int Human::Bet(int bet)
 		return 0;
 }
 
-int Human::Split(int bet)
+bool Human::DoubleBet(int bet)
 {
 	if (credits >= bet * 2)
 	{
 		credits -= bet;
-		return bet;
+		return true;
 	}
 	else
 	{
-		return 0;
+		return false;
 	}
 
 	static const int INITIAL_CREDITS{ 500 };

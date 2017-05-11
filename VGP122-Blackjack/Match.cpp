@@ -3,6 +3,7 @@
 Match::Match() : gameStatus{ notStarted } 
 { 
 	players[0] = &dealer; players[1] = &player;
+	bets.push_back(0);
 }
 
 int Match::GetGameStatus()
@@ -23,7 +24,6 @@ void Match::PlayRound()
 	cout << "----------------------------------------------" << endl;
 	cout << "                   Welcome !                  " << endl;
 	cout << "----------------------------------------------" << endl;
-	bets.push_back(0);
 	GetBet();
 	cout << "You have $" << player.GetCredits() << " left" << endl;
 	cout << "----------------------------------------------" << endl;
@@ -36,7 +36,8 @@ void Match::PlayRound()
 	player.ViewHands();
 	CheckPoints(&player);
 	cout << "----------------------------------------------" << endl;
-	//GetPlay();
+	// TODO include active hand verification
+	GetPlay();
 }
 
 Card Match::GetCard() {
@@ -62,8 +63,9 @@ void Match::DealInitialHands()
 void Match::GetBet()
 {
 	cout << "Enter the amount you'd like to bet: $";
+	cin >> bets[0];
 
-	if (cin >> bets[0])
+	if (bets[0] > 0)
 	{
 		Bet(bets[0]);
 	}
@@ -91,32 +93,61 @@ void Match::Bet(int credits)
 
 void Match::GetPlay()
 {
+	// if the player only has two cards in his main hand, the round just started
+	bool beginningRound = (player.GetSingleHand(0).size() == 2);
+	// if the two first cards in the player's main hand have the same face, they can be split
+	bool splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
+	// if either one of the dealer's cards is an A, the player may surrender or take insurance
+	bool risky = (dealer.GetSingleHand(0)[0].GetFace() == "A" || dealer.GetSingleHand(0)[1].GetFace() == "A");
+	
+	// get the player's choice of play
 	cout << "Please enter an option" << endl;
-	int option{ 0 };
+	if (beginningRound) 
+	{
+		if (risky)
+		{
+			cout << "(U) sUrrender" << endl;
+			cout << "(I) take Insurance" << endl;
+		}
+		if (splitable)
+		{
+			cout << "(P) sPlit" << endl;
+		}
+		cout << "(D) Double down" << endl;
+	}
+	cout << "(H) Hit" << endl; 
+	cout << "(S) Stay" << endl;
+
+	char option{ };
+	
+	// direct play to the proper course, ensuring only valid plays are selectable
 	while (cin >> option)
 	{
-		switch (option)
+		if ((option == 'P' || option == 'p') && beginningRound && splitable)
 		{
-		case 1:
+			cout << "Splitting" << endl;
+			Split();
 			break;
-		default:
-			cout << "Option invalid. Please enter (1), (2) or (3)." << endl;
+		}
+		else
+		{
+			cout << "Option invalid. Please enter a valid play." << endl;
 			Common::FlushInput();
-			break;
 		}
 	}
 }
 
 void Match::Split()
 {
-	if (player.Split(bets[0]) > 0)
+	if (player.DoubleBet(bets[0]))
 	{
-		bets[0] *= 2;
 		bets.push_back(bets[0]);
+		// TOOD add hand splitting
 	}
 	else
 	{
 		cout << "Insuficient credits to split. Please choose another play." << endl;
+		GetPlay();
 	}
 }
 

@@ -33,6 +33,7 @@ const Card Deck::GetCard()
 // TODO Remove at the end
 void Deck::TEMP_ShowDeck()
 {
+	cout << "Deck Size: " << cards.size() << endl;
 	for (Card card : cards)
 	{
 		card.ViewCard();
