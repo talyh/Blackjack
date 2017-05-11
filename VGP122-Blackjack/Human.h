@@ -8,6 +8,8 @@ class Human : public Player
 public:
 	Human();
 
+	int GetCredits();
+
 	int Bet(int bet);	// return bet if the player has sufficient credits to place the bet
 						// returns 0 if the player doesn't have sufficient credits
 

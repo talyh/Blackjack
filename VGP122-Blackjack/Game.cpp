@@ -39,26 +39,18 @@ void GetOption()
 		switch (option)
 		{
 			case 1:
-			{
 				match.StartGame();
 				break;
-			}
 			case 2:
-			{
 				ShowInstructions();
 				break;
-			}
 			case 3:
-			{
 				system("exit");
 				break;
-			}
 			default:
-			{
 				cout << "Option invalid. Please enter (1), (2) or (3)." << endl;
 				Common::FlushInput();
 				break;
-			}
 		}
 	}
 }

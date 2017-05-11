@@ -2,6 +2,11 @@
 
 Human::Human() : credits{ Human::INITIAL_CREDITS } { Player::TEMPname = 'h'; }
 
+int Human::GetCredits()
+{
+	return credits;
+}
+
 int Human::Bet(int bet)
 {
 	if (credits >= bet)
