@@ -35,7 +35,6 @@ const string Card::GetSuit()
 	return suit;
 }
 
-
 const int Card::GetFaceValue()
 {
 	return faceValue;
@@ -48,5 +47,5 @@ const bool Card::GetFaceUp()
 
 void Card::ViewCard()
 {
-	cout << GetFace() << " of " << GetSuit() << " (worth " << GetFaceValue() << ")" << endl;
+	cout << GetFace() << " of " << GetSuit() << " (worth " << (face == "A" ? "1 / 11" : to_string(GetFaceValue())) << ")" << endl;
 }

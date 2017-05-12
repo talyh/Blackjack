@@ -25,26 +25,22 @@ void Match::StartGame()
 
 	// play
 	// TODO - add loop
+	cout << "----------------------------------------------" << endl;
+	cout << "                   Welcome !                  " << endl;
+	cout << "----------------------------------------------" << endl;
 	PlayRound();
 }
 
 void Match::PlayRound()
 {
-	cout << "----------------------------------------------" << endl;
-	cout << "                   Welcome !                  " << endl;
-	cout << "----------------------------------------------" << endl;
+	beginningRound = true;
+	finishedRound = false;
+	
 	GetBet();
 	cout << "You have $" << roundCredits << " left" << endl;
 	cout << "----------------------------------------------" << endl;
+	
 	DealInitialHands();
-
-	// if the player only has two cards in his main hand, the round just started
-	beginningRound = (player.GetSingleHand(0).size() == 2);
-	// if either one of the dealer's cards is an A, the player may surrender or take insurance
-	risky = (/*dealer.GetSingleHand(0)[0].GetFace() == "A" ||*/ dealer.GetSingleHand(0)[1].GetFace() == "A");
-	// if the two first cards in the player's main hand have the same face, they can be split
-	splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
-
 	cout << "-------------------------" << endl;
 	cout << "Dealer's Hand: " << endl;
 	dealer.ViewHands();
@@ -55,6 +51,7 @@ void Match::PlayRound()
 	CalculatePlayerScore(&player);
 	cout << "Points: " << player.GetHandScore() << endl;
 	cout << "-------------------------" << endl;
+	
 	if (risky)
 	{
 		OfferInsurance();
@@ -67,13 +64,15 @@ void Match::PlayRound()
 	else
 	{
 		// TODO include active hand verification
-		GetPlay(&beginningRound, &splitable);
+		while (!finishedRound)
+		{
+			GetPlay(beginningRound, splitable);
+		}
 	}
-	//CheckPoints(&player, &beginningRound);
 	cout << "----------------------------------------------" << endl;	
 }
 
-Card Match::GetCard() {
+Card Match::DrawCard() {
 	return deck.GetCard();
 }
 
@@ -83,9 +82,14 @@ void Match::DealInitialHands()
 	{
 		for (size_t j{ 0 }; j < players[i]->INITIAL_HAND_SIZE; j++)
 		{
-			dealer.DealCard(GetCard(), players[i]);
+			dealer.DealCard(DrawCard(), players[i]);
 		}
 	}
+
+	// if either one of the dealer's cards is an A, the player may surrender or take insurance
+	risky = (/*dealer.GetSingleHand(0)[0].GetFace() == "A" ||*/ dealer.GetSingleHand(0)[1].GetFace() == "A");
+	// if the two first cards in the player's main hand have the same face, they can be split
+	splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
 }
 
 void Match::GetBet()
@@ -150,6 +154,12 @@ void Match::GetPlay(bool beginningRound, bool splitable)
 			Split();
 			break;
 		}
+		else if (option == 'H' || option == 'h')
+		{
+			cout << "Hitting" << endl;
+			Hit(&player);
+			break;
+		}
 		else
 		{
 			cout << "Option invalid. Please enter a valid play." << endl;
@@ -170,8 +180,17 @@ void Match::Split()
 	else
 	{
 		cout << "Insuficient credits to split. Please choose another play." << endl;
-		GetPlay(&beginningRound, &splitable);
+		GetPlay(beginningRound, splitable);
 	}
+}
+
+void Match::Hit(Player* currentPlayer)
+{
+	dealer.DealCard(DrawCard(), currentPlayer);
+	cout << "-------------------------" << endl;
+	cout << "Current hand: " << endl;
+	player.ViewHands();
+	cout << "-------------------------" << endl;
 }
 
 void Match::FinishRound()
@@ -186,6 +205,8 @@ void Match::FinishRound()
 
 	// reset handsScore
 	 // reset roundCredits
+
+	finishedRound = true;
 
 	cout << "FinishRound" << endl;
 	for (Player* currentPlayer : players)
