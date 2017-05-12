@@ -2,9 +2,9 @@
 
 Dealer::Dealer() { Player::type = "dealer"; }
 
-void Dealer::DealCard(Card card, Player * currentPlayer)
+void Dealer::DealCard(Card card, Player * currentPlayer, int hand)
 {
-	currentPlayer->ReceiveCard(card);
+	currentPlayer->ReceiveCard(card, hand);
 }
 
 void Dealer::ReceiveCard(Card card, int hand)

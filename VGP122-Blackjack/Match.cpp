@@ -42,14 +42,11 @@ void Match::PlayRound()
 	
 	DealInitialHands();
 	cout << "-------------------------" << endl;
-	cout << "Dealer's Hand: " << endl;
-	dealer.ViewHands();
-	CalculatePlayerScore(&dealer);
+	cout << "Dealer's: " << endl;
+	ViewPlayerGame(&dealer, false);
 	cout << "-------------------------" << endl;
-	cout << "Your Hand: " << endl;
-	player.ViewHands();
-	CalculatePlayerScore(&player);
-	cout << "Points: " << player.GetHandScore() << endl;
+	cout << "You: " << endl;
+	ViewPlayerGame(&player);
 	cout << "-------------------------" << endl;
 	
 	if (risky)
@@ -67,6 +64,11 @@ void Match::PlayRound()
 		while (!finishedRound)
 		{
 			GetPlay(beginningRound, splitable);
+			if (CheckPlayerCards(&player, false) != 0)
+			{
+				// TODO add dealer play
+				FinishRound();
+			}
 		}
 	}
 	cout << "----------------------------------------------" << endl;	
@@ -84,6 +86,7 @@ void Match::DealInitialHands()
 		{
 			dealer.DealCard(DrawCard(), players[i]);
 		}
+		CalculatePlayerScore(players[i]);
 	}
 
 	// if either one of the dealer's cards is an A, the player may surrender or take insurance
@@ -184,13 +187,11 @@ void Match::Split()
 	}
 }
 
-void Match::Hit(Player* currentPlayer)
+void Match::Hit(Player* currentPlayer, int hand)
 {
-	dealer.DealCard(DrawCard(), currentPlayer);
-	cout << "-------------------------" << endl;
-	cout << "Current hand: " << endl;
-	player.ViewHands();
-	cout << "-------------------------" << endl;
+	dealer.DealCard(DrawCard(), currentPlayer, hand);
+	CalculatePlayerScore(currentPlayer, hand);
+	ViewPlayerGame(currentPlayer, true, hand);
 }
 
 void Match::FinishRound()
@@ -264,12 +265,15 @@ int Match::CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand
 	}
 }
 
-void Match::TEMP_ShowBets()
+void Match::ViewPlayerGame(Player* currentPlayer, bool showScore, int hand)
 {
-	int i{ 0 };
-	for (int bet : bets)
+	cout << "-------------------------" << endl;
+	cout << "Current hand: " << endl;
+	currentPlayer->ViewHands();
+	if (showScore)
 	{
-		cout << i++ << ". " << bet << endl;
+		cout << "Hand total: " << currentPlayer->GetHandScore(hand) << endl;
 	}
+	cout << "-------------------------" << endl;
 }
 

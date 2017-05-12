@@ -32,7 +32,7 @@ public:
 
 	void Split();
 
-	void Hit(Player* currentPlayer);
+	void Hit(Player* currentPlayer, int hand = 0);
 
 	void FinishRound();
 
@@ -43,7 +43,7 @@ public:
 			// returns 2 for Natural Blackjack
 			// returns 3 for 21 points
 
-	void TEMP_ShowBets();
+	void ViewPlayerGame(Player* currentPlayer, bool showScore = true, int hand = 0);
 
 	static const enum GAMESTATUS { notStarted, running, over };
 	
