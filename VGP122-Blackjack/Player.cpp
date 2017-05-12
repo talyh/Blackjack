@@ -7,11 +7,14 @@ Player::Player() : hands(Player::INITIAL_HANDS), handsActive(Player::INITIAL_HAN
 
 void Player::ReceiveCard(Card card, int hand)
 {
+	// if there's not yet a hand "row" to store cards, create a new row and mark that hand active
 	if (hands.size() <= hand)
 	{
 		vector<Card> temp;
 		hands.push_back(temp);
+		Player::handsActive.push_back(true);
 	}
+	// place new card at the end of the selected row
 	hands[hand].push_back(card);
 }
 
@@ -46,7 +49,14 @@ void Player::ViewHands()
 	{
 		for (size_t j{0}; j < hands[i].size(); j++)
 		{
-			hands[i][j].ViewCard();
+			if (hands[i][j].GetFaceUp())
+			{
+				hands[i][j].ViewCard();
+			}
+			else
+			{
+				cout << " << Card is hidden >>" << endl;
+			}
 		}
 	}
 }

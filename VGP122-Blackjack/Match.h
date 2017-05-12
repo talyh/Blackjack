@@ -20,8 +20,6 @@ public:
 
 	Card GetCard();
 
-	void DealCard(Card card, Player* player);
-
 	void DealInitialHands();
 
 	void GetBet();

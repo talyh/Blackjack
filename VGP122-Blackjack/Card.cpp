@@ -1,5 +1,10 @@
 #include "Card.h"
 
+Card::Card()
+{
+	Card::SetFaceUp(true);
+}
+
 void Card::SetFace(string face)
 {
 	this->face = face;
@@ -15,20 +20,30 @@ void Card::SetFaceValue(string face)
 	faceValue = face == "A" ? 11 : (face == "J" || face == "Q" || face == "K") ? 10 : stoi(face);
 }
 
-string Card::GetFace()
+void Card::SetFaceUp(bool faceUp)
+{
+	this->faceUp = faceUp;
+}
+
+const string Card::GetFace()
 {
 	return face;
 }
 
-string Card::GetSuit()
+const string Card::GetSuit()
 {
 	return suit;
 }
 
 
-int Card::GetFaceValue()
+const int Card::GetFaceValue()
 {
 	return faceValue;
+}
+
+const bool Card::GetFaceUp()
+{
+	return faceUp;
 }
 
 void Card::ViewCard()

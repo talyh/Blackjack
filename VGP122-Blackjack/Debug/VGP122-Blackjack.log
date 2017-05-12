@@ -1,1 +1,7 @@
-﻿
+﻿  Player.cpp
+h:\vgp122-blackjack\vgp122-blackjack\player.cpp(11): warning C4018: '<=': signed/unsigned mismatch
+  Dealer.cpp
+h:\vgp122-blackjack\vgp122-blackjack\dealer.cpp(16): warning C4018: '<=': signed/unsigned mismatch
+  Generating Code...
+  VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.exe
+  VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.pdb (Partial PDB)

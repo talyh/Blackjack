@@ -9,7 +9,7 @@ class Player
 public:
 	Player();
 
-	void ReceiveCard(Card card, int hand = 0); // puts a card in the player's hand
+	virtual void ReceiveCard(Card card, int hand = 0); // puts a card in the player's hand
 
 	Card GetCard(int hand, int position);
 
@@ -35,7 +35,6 @@ public:
 	char TEMPname = 'p';
 protected:
 	vector<vector<Card>> hands;
-private:
 	vector<bool> handsActive;
 };
 

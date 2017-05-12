@@ -10,13 +10,17 @@ const array<string, 4> SUITS{ "Hearts", "Diamonds", "Clubs", "Spades" };
 class Card
 {
 public:
+	Card();
+	
 	void SetFace(string face);
 	void SetSuit(string suit);
 	void SetFaceValue(string face);
+	void SetFaceUp(bool faceUp);
 
-	string GetFace();
-	string GetSuit();
-	int GetFaceValue();
+	const string GetFace();
+	const string GetSuit();
+	const int GetFaceValue();
+	const bool GetFaceUp();
 
 	void ViewCard();
 
@@ -24,6 +28,7 @@ private:
 	string face;
 	string suit;
 	int faceValue;
+	bool faceUp;
 };
 
 #endif

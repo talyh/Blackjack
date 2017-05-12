@@ -45,10 +45,6 @@ Card Match::GetCard() {
 	return deck.GetCard();
 }
 
-void Match::DealCard(Card card, Player* currentPlayer)
-{
-	currentPlayer->ReceiveCard(card);
-}
 
 void Match::DealInitialHands()
 {
@@ -56,7 +52,7 @@ void Match::DealInitialHands()
 	{
 		for (size_t j{ 0 }; j < players[i]->INITIAL_HAND_SIZE; j++)
 		{
-			DealCard(GetCard(), players[i]);
+			dealer.DealCard(GetCard(), players[i]);
 		}
 	}
 }
@@ -90,11 +86,11 @@ void Match::GetBet()
 void Match::GetPlay()
 {
 	// if the player only has two cards in his main hand, the round just started
-	bool beginningRound = (player.GetSingleHand(0).size() == 2);
+	const bool beginningRound = (player.GetSingleHand(0).size() == 2);
 	// if the two first cards in the player's main hand have the same face, they can be split
-	bool splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
+	const bool splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
 	// if either one of the dealer's cards is an A, the player may surrender or take insurance
-	bool risky = (dealer.GetSingleHand(0)[0].GetFace() == "A" || dealer.GetSingleHand(0)[1].GetFace() == "A");
+	const bool risky = (dealer.GetSingleHand(0)[0].GetFace() == "A" || dealer.GetSingleHand(0)[1].GetFace() == "A");
 	
 	// get the player's choice of play
 	cout << "Please enter an option" << endl;
