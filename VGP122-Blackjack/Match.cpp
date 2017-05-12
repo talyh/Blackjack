@@ -2,8 +2,11 @@
 
 Match::Match() : gameStatus{ notStarted } 
 { 
+	// assign players to the players vector pointer
 	players[0] = &dealer; 
 	players[1] = &player;
+	
+	// create space in the bets vector to store the first bet
 	bets.push_back(0);
 }
 
@@ -16,7 +19,12 @@ void Match::StartGame()
 {
 	system("cls");
 	gameStatus = running;
+
+	// shuflle deck
 	deck.Shuffle(SHUFFLES);
+
+	// play
+	// TODO - add loop
 	PlayRound();
 }
 
@@ -29,22 +37,45 @@ void Match::PlayRound()
 	cout << "You have $" << roundCredits << " left" << endl;
 	cout << "----------------------------------------------" << endl;
 	DealInitialHands();
+
+	// if the player only has two cards in his main hand, the round just started
+	beginningRound = (player.GetSingleHand(0).size() == 2);
+	// if either one of the dealer's cards is an A, the player may surrender or take insurance
+	risky = (/*dealer.GetSingleHand(0)[0].GetFace() == "A" ||*/ dealer.GetSingleHand(0)[1].GetFace() == "A");
+	// if the two first cards in the player's main hand have the same face, they can be split
+	splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
+
+	cout << "-------------------------" << endl;
 	cout << "Dealer's Hand: " << endl;
 	dealer.ViewHands();
-	CheckPoints(&dealer);
+	CalculatePlayerScore(&dealer);
 	cout << "-------------------------" << endl;
 	cout << "Your Hand: " << endl;
 	player.ViewHands();
-	CheckPoints(&player);
-	cout << "----------------------------------------------" << endl;
-	// TODO include active hand verification
-	GetPlay();
+	CalculatePlayerScore(&player);
+	cout << "Points: " << player.GetHandScore() << endl;
+	cout << "-------------------------" << endl;
+	if (risky)
+	{
+		OfferInsurance();
+		OfferSurrender();
+	}
+	if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
+	{
+		FinishRound();
+	}
+	else
+	{
+		// TODO include active hand verification
+		GetPlay(&beginningRound, &splitable);
+	}
+	//CheckPoints(&player, &beginningRound);
+	cout << "----------------------------------------------" << endl;	
 }
 
 Card Match::GetCard() {
 	return deck.GetCard();
 }
-
 
 void Match::DealInitialHands()
 {
@@ -83,24 +114,22 @@ void Match::GetBet()
 	}
 }
 
-void Match::GetPlay()
+void Match::OfferInsurance()
 {
-	// if the player only has two cards in his main hand, the round just started
-	const bool beginningRound = (player.GetSingleHand(0).size() == 2);
-	// if the two first cards in the player's main hand have the same face, they can be split
-	const bool splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
-	// if either one of the dealer's cards is an A, the player may surrender or take insurance
-	const bool risky = (dealer.GetSingleHand(0)[0].GetFace() == "A" || dealer.GetSingleHand(0)[1].GetFace() == "A");
-	
+	cout << "Would you like insurance?" << endl;
+}
+
+void Match::OfferSurrender()
+{
+	cout << "SURRENDER NOW!" << endl;
+}
+
+void Match::GetPlay(bool beginningRound, bool splitable)
+{
 	// get the player's choice of play
 	cout << "Please enter an option" << endl;
 	if (beginningRound) 
 	{
-		if (risky)
-		{
-			cout << "(U) sUrrender" << endl;
-			cout << "(I) take Insurance" << endl;
-		}
 		if (splitable)
 		{
 			cout << "(P) sPlit" << endl;
@@ -134,14 +163,14 @@ void Match::Split()
 	if (player.ValidateBet(bets[0], 2))
 	{
 		bets.push_back(bets[0]);
-		roundCredits = player.GetCredits() - bets[0] - bets[1];
+		roundCredits = player.GetCredits() - (bets[0] * 2);
 		cout << "Now betting $" << bets[0] << " on each hand" << endl;
 		player.Split();
 	}
 	else
 	{
 		cout << "Insuficient credits to split. Please choose another play." << endl;
-		GetPlay();
+		GetPlay(&beginningRound, &splitable);
 	}
 }
 
@@ -150,11 +179,27 @@ void Match::FinishRound()
 	// resolve payment
 
 	//  delete all items from bets
+
+	// reset hands active
+
+	// reset hands
+
+	// reset handsScore
+	 // reset roundCredits
+
+	cout << "FinishRound" << endl;
+	for (Player* currentPlayer : players)
+	{
+		int i{0};
+		for (vector<Card> hand : currentPlayer->GetHands())
+		{
+			cout << currentPlayer->GetPlayerType() << "'s hand " << ++i << " got " << currentPlayer->GetHandScore(i - 1) << " points" << endl;
+		}
+	}
 }
 
-void Match::CheckPoints(Player* currentPlayer, int hand)
+void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 {
-	// TODO conaider refactor for step-by-step deal cards
 	int handScore{ 0 };
 	int handSize = currentPlayer->GetSingleHand(hand).size();
 
@@ -162,33 +207,39 @@ void Match::CheckPoints(Player* currentPlayer, int hand)
 	{
 		handScore += currentPlayer->GetCard(hand, i).GetFaceValue();
 	}
+	
+	currentPlayer->SetHandScore(handScore, hand);
+}
 
-	cout << "Points: " << handScore << endl;
-
+int Match::CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand)
+{
 	// TODO will likely need to refactor
+
+	int handScore = currentPlayer->GetHandScore(hand);
+	int handSize = currentPlayer->GetSingleHand(hand).size();
 
 	if (handScore >= 21)
 	{
-		if (handScore > 21)
+		if (handScore > 21 && !beginningRound)
 		{
-			cout << "Busted" << endl;
+			return 1;
 		}
 		else //handScore = 21
 		{
 			if (handSize = 2) // a Blackjack can only be accomplished by 2 cards
 			{
-				cout << "Blackjack" << endl;
+				return 2;
 			}
 			else
 			{
-				cout << "You got 21!" << endl;
+				return 3;
 			}
 		}
 		currentPlayer->SetHandStatus(hand, false); // stop that hand from playing any further
 	}
 	else
 	{
-		cout << "Keep Playing" << endl;
+		return 0;
 	}
 }
 

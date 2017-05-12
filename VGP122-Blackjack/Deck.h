@@ -1,8 +1,8 @@
-#include "Common.h"
-#include "Card.h"
-
 #ifndef DECK_H
 #define DECK_H
+
+#include "Common.h"
+#include "Card.h"
 
 class Deck {
 public:

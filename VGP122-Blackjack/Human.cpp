@@ -1,6 +1,6 @@
 #include "Human.h"
 
-Human::Human() : credits{ Human::INITIAL_CREDITS } { Player::TEMPname = 'h'; }
+Human::Human() : credits{ Human::INITIAL_CREDITS } { Player::type = "guest"; }
 
 int Human::GetCredits()
 {

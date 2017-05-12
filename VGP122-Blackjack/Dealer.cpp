@@ -1,5 +1,7 @@
 #include "Dealer.h"
 
+Dealer::Dealer() { Player::type = "dealer"; }
+
 void Dealer::DealCard(Card card, Player * currentPlayer)
 {
 	currentPlayer->ReceiveCard(card);

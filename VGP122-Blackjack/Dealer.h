@@ -1,12 +1,12 @@
-#include "Player.h"
-
 #ifndef DEALER_H
 #define DEALER_H
+
+#include "Player.h"
 
 class Dealer : public Player
 {
 public:
-	Dealer()  {Player::TEMPname = 'd'; }
+	Dealer();
 
 	void DealCard(Card card, Player* currentPlayer);
 

@@ -1,3 +1,6 @@
+#ifndef COMMON_H
+#define COMMON_H
+
 #include <iostream>
 #include <string>
 #include <iomanip>
@@ -7,9 +10,6 @@
 #include <cstdlib>
 
 using namespace std;
-
-#ifndef COMMON_H
-#define COMMON_H
 
 class Common
 {

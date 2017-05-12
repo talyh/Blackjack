@@ -1,11 +1,11 @@
+#ifndef MATCH_H
+#define  MATCH_H
+
 #include "Common.h"
 #include "Deck.h"
 #include "Player.h"
 #include "Dealer.h"
 #include "Human.h"
-
-#ifndef MATCH_H
-#define  MATCH_H
 
 class Match
 {
@@ -24,13 +24,22 @@ public:
 
 	void GetBet();
 
-	void GetPlay();
+	void OfferInsurance();
+
+	void OfferSurrender();
+
+	void GetPlay(bool beginningRound = false, bool splitable = false);
 
 	void Split();
 
 	void FinishRound();
 
-	void CheckPoints(Player* currentPlayer, int hand = 0);
+	void CalculatePlayerScore(Player* currentPlayer, int hand = 0);
+
+	int CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand = 0); // returns 0 for Keep Playing
+			// returns 1 for Busted
+			// returns 2 for Natural Blackjack
+			// returns 3 for 21 points
 
 	void TEMP_ShowBets();
 
@@ -48,6 +57,10 @@ private:
 	array<Player*, numberOfPlayers> players; // to be able to list through the Player objects in the game
 	Human player;
 	Dealer dealer;
+
+	bool beginningRound; // to determine if we're in the first dealing of a round
+	bool risky; // to determine if the player should be allowed to take Insurance or Surrender
+	bool splitable; // to determine if the hand can be split
 };
 
 #endif
