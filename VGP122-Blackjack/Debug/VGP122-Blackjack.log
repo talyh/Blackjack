@@ -1,11 +1,1 @@
-﻿  Game.cpp
-h:\vgp122-blackjack\vgp122-blackjack\match.h(41): warning C4091: 'static ': ignored on left of 'const Match::GAMESTATUS' when no variable is declared
-  Generating Code...
-  Compiling...
-  Match.cpp
-h:\vgp122-blackjack\vgp122-blackjack\match.h(41): warning C4091: 'static ': ignored on left of 'const Match::GAMESTATUS' when no variable is declared
-h:\vgp122-blackjack\vgp122-blackjack\match.cpp(56): warning C4018: '<': signed/unsigned mismatch
-h:\vgp122-blackjack\vgp122-blackjack\match.cpp(167): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
-  VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.exe
-  VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.pdb (Partial PDB)
+﻿

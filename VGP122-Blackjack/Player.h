@@ -33,8 +33,9 @@ public:
 	static const int INITIAL_HAND_SIZE{ 2 };
 
 	char TEMPname = 'p';
-private:
+protected:
 	vector<vector<Card>> hands;
+private:
 	vector<bool> handsActive;
 };
 

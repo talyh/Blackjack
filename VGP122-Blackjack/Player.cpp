@@ -7,6 +7,11 @@ Player::Player() : hands(Player::INITIAL_HANDS), handsActive(Player::INITIAL_HAN
 
 void Player::ReceiveCard(Card card, int hand)
 {
+	if (hands.size() <= hand)
+	{
+		vector<Card> temp;
+		hands.push_back(temp);
+	}
 	hands[hand].push_back(card);
 }
 

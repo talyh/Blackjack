@@ -7,28 +7,20 @@ int Human::GetCredits()
 	return credits;
 }
 
-int Human::Bet(int bet)
+bool Human::ValidateBet(unsigned int bet, unsigned int multiplier)
 {
-	if (credits >= bet)
+	if (credits >= bet * multiplier)
 	{
-		credits -= bet;
-		return bet;
-	}
-	else
-		return 0;
-}
-
-bool Human::DoubleBet(int bet)
-{
-	if (credits >= bet * 2)
-	{
-		credits -= bet;
 		return true;
 	}
 	else
 	{
 		return false;
 	}
+}
 
-	static const int INITIAL_CREDITS{ 500 };
+void Human::Split()
+{
+	Player::ReceiveCard(hands[0][1], 1);
+	Player::hands[0].pop_back();
 }

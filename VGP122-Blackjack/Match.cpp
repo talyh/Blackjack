@@ -2,7 +2,8 @@
 
 Match::Match() : gameStatus{ notStarted } 
 { 
-	players[0] = &dealer; players[1] = &player;
+	players[0] = &dealer; 
+	players[1] = &player;
 	bets.push_back(0);
 }
 
@@ -25,7 +26,7 @@ void Match::PlayRound()
 	cout << "                   Welcome !                  " << endl;
 	cout << "----------------------------------------------" << endl;
 	GetBet();
-	cout << "You have $" << player.GetCredits() << " left" << endl;
+	cout << "You have $" << roundCredits << " left" << endl;
 	cout << "----------------------------------------------" << endl;
 	DealInitialHands();
 	cout << "Dealer's Hand: " << endl;
@@ -66,27 +67,22 @@ void Match::GetBet()
 	cin >> bets[0];
 
 	if (bets[0] > 0)
-	{
-		Bet(bets[0]);
+	{	
+		if (player.ValidateBet(bets[0]))
+		{
+			roundCredits = player.GetCredits() - bets[0];
+			cout << "Betting $" << bets[0] << endl;
+		}
+		else
+		{
+			cout << "Insuficient credits." << endl;
+			GetBet();
+		}
 	}
 	else
 	{
 		cout << "Invalid bet." << endl;
 		Common::FlushInput();
-		GetBet();
-	}
-}
-
-void Match::Bet(int credits)
-{
-	if (player.Bet(credits) > 0)
-	{
-		bets[0] = credits;
-		cout << "Betting $" << bets[0] << endl;
-	}
-	else
-	{
-		cout << "Insuficient credits." << endl;
 		GetBet();
 	}
 }
@@ -139,10 +135,12 @@ void Match::GetPlay()
 
 void Match::Split()
 {
-	if (player.DoubleBet(bets[0]))
+	if (player.ValidateBet(bets[0], 2))
 	{
 		bets.push_back(bets[0]);
-		// TOOD add hand splitting
+		roundCredits = player.GetCredits() - bets[0] - bets[1];
+		cout << "Now betting $" << bets[0] << " on each hand" << endl;
+		player.Split();
 	}
 	else
 	{

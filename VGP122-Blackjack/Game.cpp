@@ -11,7 +11,7 @@ Match match;
 
 void main()
 {
-
+	srand(static_cast<unsigned int>(time(0)));
 	
 	while (match.GetGameStatus() == Match::notStarted)
 	{

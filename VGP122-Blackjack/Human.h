@@ -10,10 +10,9 @@ public:
 
 	int GetCredits();
 
-	int Bet(int bet);	// return bet if the player has sufficient credits to place the bet
-						// returns 0 if the player doesn't have sufficient credits
+	bool ValidateBet(unsigned int bet, unsigned int multiplier = 1);	// validates the player has enough credits to place the bet, considering a multiplier if needed
 
-	bool DoubleBet(int bet);	// checks whether the player has enough credits to double the bet for a Split or a DoubleDown
+	void Split();
 
 	static const int INITIAL_CREDITS{ 500 };
 
