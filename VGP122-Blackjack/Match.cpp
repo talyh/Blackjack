@@ -1,12 +1,13 @@
 #include "Match.h"
 
-// TODO include A decision
 // TODO include Surrender
 // TODO include Insurance
 // TODO include Double Down
-// TODO Blackjack for player on initial Round not showing FinishGame
-// TODO adjust FinishRound cleanup
+// TODO BUG Blackjack for player on initial Round not skipping straight to FinishGame
+// TODO adjust FinishRound cleanup <----- NEXT
+// TODO Split must hit and show hands THEN ask Play
 // TODO test Split
+// TODO BUG Double Down & Split showing past first round
 
 
 Match::Match() : gameStatus{ notStarted } 
@@ -283,6 +284,7 @@ void Match::FinishRound()
 
 	cout << "House got " << dealer.GetHandScore() << " points" << endl;
 	dealer.ViewHands();
+	cout << "---------------------" << endl;
 	cout << "You got " << endl;
 
 	int i{ 0 };
@@ -321,8 +323,10 @@ void Match::FinishRound()
 		{
 			handResultCheck = 100; // something wrong happened
 		}
+		cout << "----------------" << endl;
 		PayBet(handResultCheck, i);
 		i++;
+		cout << "----------------------" << endl;
 	}
 
 	roundCredits = 0;
@@ -337,13 +341,29 @@ void Match::FinishGame()
 void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 {
 	int handScore{ 0 };
-	int handSize = currentPlayer->GetSingleHand(hand).size();
-
-	for (size_t i{ 0 }; i < handSize; i++)
+	int i{ 0 };
+	int As{ 0 };
+	for (Card card : currentPlayer->GetSingleHand(hand))
 	{
-		handScore += currentPlayer->GetCard(hand, i)->GetFaceValue();
+		// loop through regular cards first to assess how As should behave
+		if (card.GetFace() != "A")
+		{
+			handScore += card.GetFaceValue();
+		}
+		else
+		{
+			As++;
+		}
+		i++;
+	}
+
+	// loop through As
+	for (int j{ 0 }; j < As; j++)
+	{
+		handScore += DecideAValue(currentPlayer, hand);
 	}
 	
+	// set player's score to the determined value
 	currentPlayer->SetHandScore(handScore, hand);
 }
 
@@ -404,7 +424,7 @@ void Match::PayBet(int playerResult, int hand)
 		}
 		case 1: // blackjack
 		{
-			int pay = bets[hand] * 1.5;
+			double pay = bets[hand] * 1.5;
 			cout << "Receiving $" << pay << endl;
 			player.AdjustCredits(pay);
 			bets[hand] = 0;
@@ -414,7 +434,7 @@ void Match::PayBet(int playerResult, int hand)
 		case 2: // long 21
 		case 3: // player closer to 21
 		{
-			int pay = bets[hand] * 2.5;
+			double pay = bets[hand] * 2.5;
 			cout << "Receiving $" << pay << endl;
 			player.AdjustCredits(pay);
 			bets[hand] = 0;
@@ -435,5 +455,10 @@ void Match::PayBet(int playerResult, int hand)
 			break; 
 		}
 	}
+}
+
+int Match::DecideAValue(Player* currentPlayer, int hand)
+{
+	return currentPlayer->GetHandScore(hand) + 11 > 21 ? 1 : 11;
 }
 

@@ -55,6 +55,8 @@ public:
 
 	void PayBet(int playerResult, int hand = 0);
 
+	int DecideAValue(Player* currentPlayer, int hand = 0); // determines whether A should be counted as 1 or 11 and returns that value
+
 	static const enum GAMESTATUS { notStarted, running, over };
 	
 	static const int numberOfPlayers{ 2 };
