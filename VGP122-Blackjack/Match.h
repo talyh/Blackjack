@@ -28,6 +28,10 @@ public:
 
 	void OfferSurrender();
 
+	void LetPlayerPlay(bool* winningChance);
+
+	void LetHousePlay();
+
 	void GetPlay(int hand = 0, bool beginningRound = false, bool splitable = false);
 
 	void Hit(Player* currentPlayer, int hand = 0);

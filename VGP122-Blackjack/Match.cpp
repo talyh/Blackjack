@@ -4,9 +4,9 @@
 // TODO include Surrender
 // TODO include Insurance
 // TODO include Double Down
-// TODO include Bet Collection
-// TODO busted should skip dealer's turn
-// TODO Blackjack fir player on initial Round not showing FinishGame
+// TODO Blackjack for player on initial Round not showing FinishGame
+// TODO adjust FinishRound cleanup
+// TODO test Split
 
 
 Match::Match() : gameStatus{ notStarted } 
@@ -62,38 +62,34 @@ void Match::PlayRound()
 	cout << "You: " << endl;
 	ViewPlayerGame(&player);
 	
+	// if dealer has A showing, let player have additional options
 	if (risky)
 	{
 		OfferInsurance();
 		OfferSurrender();
 	}
+
+	// if any of the players got a natural blackjack, jump to Finish Round
 	if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
 	{
 		FinishRound();
 	}
+	// if not, play as usual
 	else
 	{
-		// Player's turn
+		// player's turn
 		cout << "---------------- Your Turn ------------------" << endl;
-		bool stillPlaying = true;
-		while (stillPlaying)
+		bool winningChance{ true };
+		LetPlayerPlay(&winningChance);
+
+		if (!winningChance)
 		{
-			for (bool handActive : player.GetHandsStatus())
-			{
-				stillPlaying = (handActive && stillPlaying);
-			}
-			if (stillPlaying)
-			{
-				GetPlay(0, beginningRound, splitable);
-			}
+			// house's turn
+			cout << "-------------- House Turn ------------------" << endl;
+			LetHousePlay();
 		}
-		cout << "-------------- House Turn ------------------" << endl;
-		dealer.GetCard(0,0)->Flip();
-		dealer.ViewHands();
-		while (dealer.GetHandScore() <= 17)
-		{
-			Hit(&dealer);
-		}
+		
+		// finish round
 		FinishRound();
 	}
 	cout << "----------------------------------------------" << endl;	
@@ -154,6 +150,42 @@ void Match::OfferInsurance()
 void Match::OfferSurrender()
 {
 	cout << "SURRENDER NOW!" << endl;
+}
+
+void Match::LetPlayerPlay(bool* winningChance)
+{
+	bool stillPlaying = true;
+	while (stillPlaying)
+	{
+		for (bool handActive : player.GetHandsStatus())
+		{
+			stillPlaying = (handActive && stillPlaying);
+		}
+		if (stillPlaying)
+		{
+			GetPlay(0, beginningRound, splitable);
+		}
+	}
+
+	// check if any of the player's hand still has a wiinning chance
+	
+	int i{ 0 };
+	for (vector<Card> hand : player.GetHands())
+	{
+		bool handBusted = player.GetHandScore(i) > 21;
+		*winningChance = winningChance && handBusted;
+		i++;
+	}
+}
+
+void Match::LetHousePlay()
+{
+	dealer.GetCard(0, 0)->Flip();
+	dealer.ViewHands();
+	while (dealer.GetHandScore() <= 17)
+	{
+		Hit(&dealer);
+	}
 }
 
 void Match::GetPlay(int hand, bool beginningRound, bool splitable)
@@ -290,6 +322,7 @@ void Match::FinishRound()
 			handResultCheck = 100; // something wrong happened
 		}
 		PayBet(handResultCheck, i);
+		i++;
 	}
 
 	roundCredits = 0;
