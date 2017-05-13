@@ -20,9 +20,14 @@ void Player::ReceiveCard(Card card, int hand)
 	hands[hand].push_back(card);
 }
 
-Card Player::GetCard(int hand, int position)
+void Player::Stay(int hand)
 {
-	return hands[hand][position];
+	SetHandStatus(hand, false);
+}
+
+Card* Player::GetCard(int hand, int position)
+{
+	return &hands[hand][position];
 }
 
 vector<Card> Player::GetSingleHand(int hand)
@@ -34,11 +39,6 @@ vector<vector<Card>> Player::GetHands()
 {
 	return hands;
 }
-
-//bool Player::GetHandStatus(int hand)
-//{
-//	return handsActive[hand];
-//}
 
 vector<bool> Player::GetHandsStatus()
 {

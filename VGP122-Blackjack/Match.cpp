@@ -5,6 +5,8 @@
 // TODO include Insurance
 // TODO include Double Down
 // TODO include Bet Collection
+// TODO busted should skip dealer's turn
+// TODO Blackjack fir player on initial Round not showing FinishGame
 
 
 Match::Match() : gameStatus{ notStarted } 
@@ -57,10 +59,8 @@ void Match::PlayRound()
 	cout << "-------------------------" << endl;
 	cout << "Dealer's: " << endl;
 	ViewPlayerGame(&dealer, false);
-	cout << "---------------" << endl;
 	cout << "You: " << endl;
 	ViewPlayerGame(&player);
-	cout << "---------------" << endl;
 	
 	if (risky)
 	{
@@ -84,12 +84,12 @@ void Match::PlayRound()
 			}
 			if (stillPlaying)
 			{
-				GetPlay(beginningRound, splitable);
+				GetPlay(0, beginningRound, splitable);
 			}
-			// TODO busted should skip dealer's turn
 		}
 		cout << "-------------- House Turn ------------------" << endl;
-		dealer.GetCard(0, 0).Flip();
+		dealer.GetCard(0,0)->Flip();
+		dealer.ViewHands();
 		while (dealer.GetHandScore() <= 17)
 		{
 			Hit(&dealer);
@@ -156,7 +156,7 @@ void Match::OfferSurrender()
 	cout << "SURRENDER NOW!" << endl;
 }
 
-void Match::GetPlay(bool beginningRound, bool splitable)
+void Match::GetPlay(int hand, bool beginningRound, bool splitable)
 {
 	// TODO account for multiple hands
 	
@@ -187,13 +187,13 @@ void Match::GetPlay(bool beginningRound, bool splitable)
 		else if (option == 'H' || option == 'h')
 		{
 			cout << "Hitting" << endl;
-			Hit(&player);
+			Hit(&player, hand);	
 			break;
 		}
 		else if (option == 'S' || option == 's')
 		{
 			cout << "Staying" << endl;
-			Stay(&player);
+			player.Stay(hand);
 			break;
 		}
 		else
@@ -212,11 +212,6 @@ void Match::Hit(Player* currentPlayer, int hand)
 	CheckPlayerCards(currentPlayer, false, hand);
 }
 
-void Match::Stay(Player* currentPlayer, int hand)
-{
-	currentPlayer->SetHandStatus(hand, false);
-}
-
 void Match::Split()
 {
 	if (player.ValidateBet(bets[0], 2))
@@ -229,57 +224,80 @@ void Match::Split()
 	else
 	{
 		cout << "Insuficient credits to split. Please choose another play." << endl;
-		GetPlay(beginningRound, splitable);
+		GetPlay(0, beginningRound, splitable);
 	}
+
+	// TODO call hit for each hand
 }
 
 void Match::FinishRound()
 {
-	// resolve payment
-
-	//  delete all items from bets
+	
 
 	// reset hands active
 
 	// reset hands
 
 	// reset handsScore
-	 // reset roundCredits
+
+	// probably already resolved in PayBet
+	// resolve payment
+	//  delete all items from bets
+	 // reset roundCredits 
 
 	finishedRound = true;
 
-	cout << "FinishRound" << endl;
+	cout << "------------ Finishing Round ---------------" << endl;
 
 	cout << "House got " << dealer.GetHandScore() << " points" << endl;
 	dealer.ViewHands();
 	cout << "You got " << endl;
 
 	int i{ 0 };
-	int dealerRoundResult = CheckPlayerCards(&dealer, false, 0);
+	int dealerRoundResult = dealer.GetHandScore();
 	for (vector<Card> hand : player.GetHands())
 	{
-		cout << "hand " << i + 1 << " got " << player.GetHandScore(i) << " points" << endl;
-		int handRoundResult = CheckPlayerCards(&player, false, i);
-		if (dealerRoundResult == handRoundResult)
+		cout << "hand " << i + 1 << " --> " << player.GetHandScore(i) << " points" << endl;
+		int handRoundResult = player.GetHandScore(i);
+		int handSize = player.GetSingleHand(i).size();
+		int handResultCheck{ 0 };
+		if (handRoundResult > 21)
 		{
-			cout << "hand " << i++ << " tied" << endl;
-			// CollectBet();
+			handResultCheck = 0; // busted
+		} 
+		else if (handRoundResult == 21 &&  handSize == 2)
+		{ 
+			handResultCheck = 1; // blackjack
 		}
-		else if (dealerRoundResult > handRoundResult)
+		else if (handRoundResult == 21 && handSize > 2)
 		{
-			cout << "House wins" << endl;
-			// CollectBet();
+			handResultCheck = 2; // 21 with more than 2 cards
+		}
+		else if (handRoundResult > dealerRoundResult)
+		{
+			handResultCheck = 3; // player got closer to 21
+		}
+		else if (handRoundResult < dealerRoundResult)
+		{
+			handResultCheck = 4; // dealer got closer to 21
+		}
+		else if (handRoundResult == dealerRoundResult)
+		{
+			handResultCheck = 5; // tie
 		}
 		else
 		{
-			cout << "You win!" << endl;
-			// CollectBet();
+			handResultCheck = 100; // something wrong happened
 		}
+		PayBet(handResultCheck, i);
 	}
+
+	roundCredits = 0;
 }
 
 void Match::FinishGame()
 {
+	gameStatus = over;
 	cout << "Thanks for playing!" << endl;
 }
 
@@ -290,7 +308,7 @@ void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 
 	for (size_t i{ 0 }; i < handSize; i++)
 	{
-		handScore += currentPlayer->GetCard(hand, i).GetFaceValue();
+		handScore += currentPlayer->GetCard(hand, i)->GetFaceValue();
 	}
 	
 	currentPlayer->SetHandScore(handScore, hand);
@@ -298,8 +316,6 @@ void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 
 int Match::CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand)
 {
-	// TODO will likely need to refactor
-
 	int handScore = currentPlayer->GetHandScore(hand);
 	int handSize = currentPlayer->GetSingleHand(hand).size();
 
@@ -338,5 +354,53 @@ void Match::ViewPlayerGame(Player* currentPlayer, bool showScore, int hand)
 		cout << "Hand total: " << currentPlayer->GetHandScore(hand) << endl;
 	}
 	cout << "-------------------------" << endl;
+}
+
+void Match::PayBet(int playerResult, int hand)
+{
+	switch (playerResult)
+	{
+		case 0: // busted
+		case 4: // dealer closer to 21
+		{
+			cout << "Bet of $" << bets[hand] << " payed to the House" << endl;
+			player.AdjustCredits(-bets[hand]);
+			bets[hand] = 0;
+			cout << "Current Credits: $" << player.GetCredits() << endl;
+			break; 
+		}
+		case 1: // blackjack
+		{
+			int pay = bets[hand] * 1.5;
+			cout << "Receiving $" << pay << endl;
+			player.AdjustCredits(pay);
+			bets[hand] = 0;
+			cout << "Current Credits: $" << player.GetCredits() << endl;
+			break; 
+		}
+		case 2: // long 21
+		case 3: // player closer to 21
+		{
+			int pay = bets[hand] * 2.5;
+			cout << "Receiving $" << pay << endl;
+			player.AdjustCredits(pay);
+			bets[hand] = 0;
+			cout << "Current Credits: $" << player.GetCredits() << endl; 
+			break;
+		}
+		case 5: // tie
+		{
+			cout << "Tie. No credits collected or payed." << endl;
+			bets[hand] = 0;
+			cout << "Current Credits: $" << player.GetCredits() << endl;
+			break;
+		}
+		case 100: // error
+		default:
+		{
+			cout << "Couldn't resolve bet payment" << endl;
+			break; 
+		}
+	}
 }
 

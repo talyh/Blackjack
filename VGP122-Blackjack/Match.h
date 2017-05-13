@@ -28,15 +28,13 @@ public:
 
 	void OfferSurrender();
 
-	void GetPlay(bool beginningRound = false, bool splitable = false);
+	void GetPlay(int hand = 0, bool beginningRound = false, bool splitable = false);
 
 	void Hit(Player* currentPlayer, int hand = 0);
 
-	void Stay(Player* currentPlayer, int hand = 0);
-
 	void Split();
 
-	/*void DoubleDown();*/
+	/*void DoubleDown(); {double bet, hit, stay} */
 
 	void FinishRound();
 
@@ -50,6 +48,8 @@ public:
 			// returns 3 for 21 points
 
 	void ViewPlayerGame(Player* currentPlayer, bool showScore = true, int hand = 0);
+
+	void PayBet(int playerResult, int hand = 0);
 
 	static const enum GAMESTATUS { notStarted, running, over };
 	

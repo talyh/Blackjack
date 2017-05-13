@@ -24,3 +24,8 @@ void Human::Split()
 	Player::ReceiveCard(hands[0][1], 1);
 	Player::hands[0].pop_back();
 }
+
+void Human::AdjustCredits(int amount)
+{
+	credits += amount;
+}

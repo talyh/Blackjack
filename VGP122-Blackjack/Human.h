@@ -14,6 +14,9 @@ public:
 
 	void Split();
 
+	void AdjustCredits(int amount); // sums the credits to the player's current amount
+									// accepts negative values
+
 	static const int INITIAL_CREDITS{ 500 };
 
 private:

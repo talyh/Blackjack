@@ -10,19 +10,19 @@ public:
 	Player();
 
 	virtual void ReceiveCard(Card card, int hand = 0); // puts a card in the player's hand
+	
+	void Stay(int hand = 0);
 
-	Card GetCard(int hand, int position);
+	//Card GetCard(int hand, int position);
+	Card* GetCard(int hand, int position);
 
 	vector<Card> GetSingleHand(int hand); // returns the raw vector of one of the player's hands
 
 	vector<vector<Card>> GetHands(); // returns the raw vector of hands
 
-	/*bool GetHandStatus(int hand = 0);*/ // returns the status of a hand
+	vector<bool> GetHandsStatus();	// returns the status of all the player's hands
 									// FALSE for a hand that has finished playing
 									// TRUE for a hand that is still playing
-									// the hand integer parameter corresponds to the hand position in the Hands vector
-
-	vector<bool> GetHandsStatus();
 
 	int GetHandScore(int hand = 0); // returns the current points accumulated for a given hand
 

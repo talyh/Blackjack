@@ -22,7 +22,7 @@ void Card::SetFaceValue(string face)
 
 void Card::Flip()
 {
-	faceUp == !faceUp;
+	faceUp = !faceUp;
 }
 
 const string Card::GetFace()
