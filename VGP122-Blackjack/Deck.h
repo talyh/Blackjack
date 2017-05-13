@@ -12,6 +12,8 @@ public:
 
 	const Card GetCard();
 
+	int DeckSize();
+
 	void TEMP_ShowDeck();
 
 private:

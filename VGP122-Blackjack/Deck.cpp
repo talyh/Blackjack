@@ -30,6 +30,11 @@ const Card Deck::GetCard()
 	return selected;
 }
 
+int Deck::DeckSize()
+{
+	return cards.size();
+}
+
 // TODO Remove at the end
 void Deck::TEMP_ShowDeck()
 {

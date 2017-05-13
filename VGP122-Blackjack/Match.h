@@ -63,7 +63,8 @@ public:
 private:
 	const size_t SHUFFLES{ 100 }; // to determine how many times a deck should be shuffled on start
 	GAMESTATUS gameStatus; // to keep track of the game status and flow
-	Deck deck; // to represent the deck of cards in use
+	Deck* deck; // to represent the deck of cards in use, can be replaced if the deck finishes
+	Deck currentDeck; // to represent the deck currently in play
 	vector<int> bets;	// to store the bets in play
 							// 0 represents the player's basic bet
 							// 1 represents an additional bet from a Split so each bet can be paid or collected separately

@@ -3,8 +3,8 @@
 // TODO include Surrender
 // TODO include Insurance
 // TODO include Double Down
-// TODO BUG Blackjack for player on initial Round not skipping straight to FinishGame <--- NEXT
 // TODO adjust FinishRound cleanup <----- NEXT
+// TODO flip House card on Natural Blackjack
 
 
 Match::Match() : gameStatus{ notStarted } 
@@ -15,6 +15,8 @@ Match::Match() : gameStatus{ notStarted }
 	
 	// create space in the bets vector to store the first bet
 	bets.push_back(0);
+
+	deck = &currentDeck;
 }
 
 int Match::GetGameStatus()
@@ -28,14 +30,13 @@ void Match::StartGame()
 	gameStatus = running;
 
 	// shuflle deck
-	deck.Shuffle(SHUFFLES);
+	deck->Shuffle(SHUFFLES);
 
 	// play
 	cout << "----------------------------------------------" << endl;
 	cout << "                   Welcome !                  " << endl;
 	cout << "----------------------------------------------" << endl;
 	
-	// TODO - add deck ended control
 	while (player.GetCredits() > 0)
 	{
 		PlayRound();
@@ -60,24 +61,23 @@ void Match::PlayRound()
 	cout << "You: " << endl;
 	ViewPlayerGame(&player);
 	
-	// if dealer has A showing, let player have additional options
-	if (risky)
-	{
-		OfferInsurance();
-		OfferSurrender();
-	}
-
 	// if any of the players got a natural blackjack, jump to Finish Round
 	if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
 	{
 		FinishRound();
-	}
+	}	
 	// if not, play as usual
 	else
 	{
 		// player's turn
 		cout << "---------------- Your Turn ------------------" << endl;
 		bool winningChance{ true };
+		// if dealer has A showing, let player have additional options
+		if (risky)
+		{
+			OfferInsurance();
+			OfferSurrender();
+		}
 		LetPlayerPlay(&winningChance);
 
 		if (!winningChance)
@@ -94,7 +94,11 @@ void Match::PlayRound()
 }
 
 Card Match::DrawCard() {
-	return deck.GetCard();
+	if (deck->DeckSize() < 1)
+	{
+		deck = new Deck();
+	}
+	return deck->GetCard();
 }
 
 void Match::DealInitialHands()
@@ -109,7 +113,7 @@ void Match::DealInitialHands()
 	}
 
 	// if either one of the dealer's cards is an A, the player may surrender or take insurance
-	risky = (/*dealer.GetSingleHand(0)[0].GetFace() == "A" ||*/ dealer.GetSingleHand(0)[1].GetFace() == "A");
+	risky = (dealer.GetSingleHand(0)[1].GetFace() == "A");
 	// if the two first cards in the player's main hand have the same face, they can be split
 	splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
 }
@@ -379,7 +383,7 @@ int Match::CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand
 		}
 		else //handScore = 21
 		{
-			if (handSize != 2) // a Blackjack can only be accomplished by 2 cards
+			if (handSize == 2) // a Blackjack can only be accomplished by 2 cards
 			{
 				return 2;
 			}
