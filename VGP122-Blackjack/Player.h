@@ -17,21 +17,23 @@ public:
 
 	vector<vector<Card>> GetHands(); // returns the raw vector of hands
 
-	bool GetHandStatus(int hand = 0); // returns the status of a hand
+	/*bool GetHandStatus(int hand = 0);*/ // returns the status of a hand
 									// FALSE for a hand that has finished playing
 									// TRUE for a hand that is still playing
 									// the hand integer parameter corresponds to the hand position in the Hands vector
 
-	int GetHandScore(int hand = 0);
+	vector<bool> GetHandsStatus();
 
-	string GetPlayerType();
+	int GetHandScore(int hand = 0); // returns the current points accumulated for a given hand
+
+	string GetPlayerType(); // returns the type of player (guest or dealer)
 	
 	void SetHandStatus(int hand, bool handStatus); // sets the status of a hand
 												   // FALSE for a hand that has finished playing
 												   // TRUE for a hand that is still playing
 												   // the hand integer parameter corresponds to the hand position in the Hands vector
 
-	void SetHandScore(int score, int hand = 0);
+	void SetHandScore(int score, int hand = 0); // sets the hand score for a given hand
 
 	void ViewHands(); // Shows all cards in all hands in a text format
 
@@ -39,10 +41,10 @@ public:
 	static const int INITIAL_HAND_SIZE{ 2 };
 
 protected:
-	vector<vector<Card>> hands;
-	vector<bool> handsActive;
-	vector<int> handsScore;
-	string type;
+	vector<vector<Card>> hands; // to store the Cards the player is holding, allowing for multiple hands at the same time
+	vector<bool> handsActive; // to control whether each hand is active or not
+	vector<int> handsScore; // to control the accumulated score for each hand
+	string type; // to store the type of player (guest or dealer)
 };
 
 #endif

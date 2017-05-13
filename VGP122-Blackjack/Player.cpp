@@ -3,7 +3,7 @@
 Player::Player() : hands(Player::INITIAL_HANDS), handsActive(Player::INITIAL_HANDS), handsScore(Player::INITIAL_HANDS)
 {
 	handsActive[0] = true;
-	handsActive[0] = 0;
+	handsScore[0] = 0;
 }
 
 void Player::ReceiveCard(Card card, int hand)
@@ -35,9 +35,14 @@ vector<vector<Card>> Player::GetHands()
 	return hands;
 }
 
-bool Player::GetHandStatus(int hand)
+//bool Player::GetHandStatus(int hand)
+//{
+//	return handsActive[hand];
+//}
+
+vector<bool> Player::GetHandsStatus()
 {
-	return handsActive[hand];
+	return handsActive;
 }
 
 int Player::GetHandScore(int hand)
@@ -50,9 +55,9 @@ string Player::GetPlayerType()
 	return type;
 }
 
-void Player::SetHandStatus(int hand, bool handActive)
+void Player::SetHandStatus(int hand, bool handStatus)
 {
-	this->handsActive[hand] = handActive;
+	handsActive[hand] = handStatus;
 }
 
 void Player::SetHandScore(int score, int hand)

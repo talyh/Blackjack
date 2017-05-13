@@ -30,11 +30,17 @@ public:
 
 	void GetPlay(bool beginningRound = false, bool splitable = false);
 
-	void Split();
-
 	void Hit(Player* currentPlayer, int hand = 0);
 
+	void Stay(Player* currentPlayer, int hand = 0);
+
+	void Split();
+
+	/*void DoubleDown();*/
+
 	void FinishRound();
+
+	void FinishGame();
 
 	void CalculatePlayerScore(Player* currentPlayer, int hand = 0);
 

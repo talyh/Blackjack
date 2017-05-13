@@ -1,5 +1,12 @@
 #include "Match.h"
 
+// TODO include A decision
+// TODO include Surrender
+// TODO include Insurance
+// TODO include Double Down
+// TODO include Bet Collection
+
+
 Match::Match() : gameStatus{ notStarted } 
 { 
 	// assign players to the players vector pointer
@@ -24,18 +31,24 @@ void Match::StartGame()
 	deck.Shuffle(SHUFFLES);
 
 	// play
-	// TODO - add loop
 	cout << "----------------------------------------------" << endl;
 	cout << "                   Welcome !                  " << endl;
 	cout << "----------------------------------------------" << endl;
-	PlayRound();
+	
+	// TODO - add deck ended control
+	while (player.GetCredits() > 0)
+	{
+		PlayRound();
+	}
+	FinishGame();
 }
 
 void Match::PlayRound()
 {
 	beginningRound = true;
 	finishedRound = false;
-	
+	cout << "----------------- New Round ------------------" << endl;
+	cout << "You currently have $" << player.GetCredits() << endl;
 	GetBet();
 	cout << "You have $" << roundCredits << " left" << endl;
 	cout << "----------------------------------------------" << endl;
@@ -44,10 +57,10 @@ void Match::PlayRound()
 	cout << "-------------------------" << endl;
 	cout << "Dealer's: " << endl;
 	ViewPlayerGame(&dealer, false);
-	cout << "-------------------------" << endl;
+	cout << "---------------" << endl;
 	cout << "You: " << endl;
 	ViewPlayerGame(&player);
-	cout << "-------------------------" << endl;
+	cout << "---------------" << endl;
 	
 	if (risky)
 	{
@@ -60,16 +73,28 @@ void Match::PlayRound()
 	}
 	else
 	{
-		// TODO include active hand verification
-		while (!finishedRound)
+		// Player's turn
+		cout << "---------------- Your Turn ------------------" << endl;
+		bool stillPlaying = true;
+		while (stillPlaying)
 		{
-			GetPlay(beginningRound, splitable);
-			if (CheckPlayerCards(&player, false) != 0)
+			for (bool handActive : player.GetHandsStatus())
 			{
-				// TODO add dealer play
-				FinishRound();
+				stillPlaying = (handActive && stillPlaying);
 			}
+			if (stillPlaying)
+			{
+				GetPlay(beginningRound, splitable);
+			}
+			// TODO busted should skip dealer's turn
 		}
+		cout << "-------------- House Turn ------------------" << endl;
+		dealer.GetCard(0, 0).Flip();
+		while (dealer.GetHandScore() <= 17)
+		{
+			Hit(&dealer);
+		}
+		FinishRound();
 	}
 	cout << "----------------------------------------------" << endl;	
 }
@@ -133,6 +158,8 @@ void Match::OfferSurrender()
 
 void Match::GetPlay(bool beginningRound, bool splitable)
 {
+	// TODO account for multiple hands
+	
 	// get the player's choice of play
 	cout << "Please enter an option" << endl;
 	if (beginningRound) 
@@ -163,12 +190,31 @@ void Match::GetPlay(bool beginningRound, bool splitable)
 			Hit(&player);
 			break;
 		}
+		else if (option == 'S' || option == 's')
+		{
+			cout << "Staying" << endl;
+			Stay(&player);
+			break;
+		}
 		else
 		{
 			cout << "Option invalid. Please enter a valid play." << endl;
 			Common::FlushInput();
 		}
 	}
+}
+
+void Match::Hit(Player* currentPlayer, int hand)
+{
+	dealer.DealCard(DrawCard(), currentPlayer, hand);
+	CalculatePlayerScore(currentPlayer, hand);
+	ViewPlayerGame(currentPlayer, true, hand);
+	CheckPlayerCards(currentPlayer, false, hand);
+}
+
+void Match::Stay(Player* currentPlayer, int hand)
+{
+	currentPlayer->SetHandStatus(hand, false);
 }
 
 void Match::Split()
@@ -187,13 +233,6 @@ void Match::Split()
 	}
 }
 
-void Match::Hit(Player* currentPlayer, int hand)
-{
-	dealer.DealCard(DrawCard(), currentPlayer, hand);
-	CalculatePlayerScore(currentPlayer, hand);
-	ViewPlayerGame(currentPlayer, true, hand);
-}
-
 void Match::FinishRound()
 {
 	// resolve payment
@@ -210,14 +249,38 @@ void Match::FinishRound()
 	finishedRound = true;
 
 	cout << "FinishRound" << endl;
-	for (Player* currentPlayer : players)
+
+	cout << "House got " << dealer.GetHandScore() << " points" << endl;
+	dealer.ViewHands();
+	cout << "You got " << endl;
+
+	int i{ 0 };
+	int dealerRoundResult = CheckPlayerCards(&dealer, false, 0);
+	for (vector<Card> hand : player.GetHands())
 	{
-		int i{0};
-		for (vector<Card> hand : currentPlayer->GetHands())
+		cout << "hand " << i + 1 << " got " << player.GetHandScore(i) << " points" << endl;
+		int handRoundResult = CheckPlayerCards(&player, false, i);
+		if (dealerRoundResult == handRoundResult)
 		{
-			cout << currentPlayer->GetPlayerType() << "'s hand " << ++i << " got " << currentPlayer->GetHandScore(i - 1) << " points" << endl;
+			cout << "hand " << i++ << " tied" << endl;
+			// CollectBet();
+		}
+		else if (dealerRoundResult > handRoundResult)
+		{
+			cout << "House wins" << endl;
+			// CollectBet();
+		}
+		else
+		{
+			cout << "You win!" << endl;
+			// CollectBet();
 		}
 	}
+}
+
+void Match::FinishGame()
+{
+	cout << "Thanks for playing!" << endl;
 }
 
 void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
@@ -242,13 +305,14 @@ int Match::CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand
 
 	if (handScore >= 21)
 	{
+		currentPlayer->SetHandStatus(hand, false); // stop that hand from playing any further
 		if (handScore > 21 && !beginningRound)
 		{
 			return 1;
 		}
 		else //handScore = 21
 		{
-			if (handSize = 2) // a Blackjack can only be accomplished by 2 cards
+			if (handSize != 2) // a Blackjack can only be accomplished by 2 cards
 			{
 				return 2;
 			}
@@ -257,7 +321,6 @@ int Match::CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand
 				return 3;
 			}
 		}
-		currentPlayer->SetHandStatus(hand, false); // stop that hand from playing any further
 	}
 	else
 	{

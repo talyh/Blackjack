@@ -12,7 +12,7 @@ void Dealer::ReceiveCard(Card card, int hand)
 	// if it's the dealer's very first card, hide it
 	if (empty(hands[0]))
 	{
-		card.SetFaceUp(false);
+		card.Flip();
 	}
 	// if there's not yet a hand "row" to store cards, create a new row and mark that hand active
 	if (hands.size() <= hand)
@@ -24,3 +24,5 @@ void Dealer::ReceiveCard(Card card, int hand)
 	// place new card at the end of the selected row
 	hands[hand].push_back(card);
 }
+
+

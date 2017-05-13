@@ -2,7 +2,7 @@
 
 Card::Card()
 {
-	Card::SetFaceUp(true);
+	faceUp = true;
 }
 
 void Card::SetFace(string face)
@@ -20,9 +20,9 @@ void Card::SetFaceValue(string face)
 	faceValue = face == "A" ? 11 : (face == "J" || face == "Q" || face == "K") ? 10 : stoi(face);
 }
 
-void Card::SetFaceUp(bool faceUp)
+void Card::Flip()
 {
-	this->faceUp = faceUp;
+	faceUp == !faceUp;
 }
 
 const string Card::GetFace()

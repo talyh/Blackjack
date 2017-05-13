@@ -15,7 +15,7 @@ public:
 	void SetFace(string face);
 	void SetSuit(string suit);
 	void SetFaceValue(string face);
-	void SetFaceUp(bool faceUp);
+	void Flip();
 
 	const string GetFace();
 	const string GetSuit();
