@@ -35,7 +35,7 @@ public:
 
 	void SetHandScore(int score, int hand = 0); // sets the hand score for a given hand
 
-	void ViewHands(); // Shows all cards in all hands in a text format
+	void ViewSingleHand(int hand = 0, bool showHandNumber = false); // shows all cards in a single hand in a text format
 
 	static const int INITIAL_HANDS{ 1 };
 	static const int INITIAL_HAND_SIZE{ 2 };

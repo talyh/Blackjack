@@ -3,11 +3,8 @@
 // TODO include Surrender
 // TODO include Insurance
 // TODO include Double Down
-// TODO BUG Blackjack for player on initial Round not skipping straight to FinishGame
+// TODO BUG Blackjack for player on initial Round not skipping straight to FinishGame <--- NEXT
 // TODO adjust FinishRound cleanup <----- NEXT
-// TODO Split must hit and show hands THEN ask Play
-// TODO test Split
-// TODO BUG Double Down & Split showing past first round
 
 
 Match::Match() : gameStatus{ notStarted } 
@@ -57,7 +54,7 @@ void Match::PlayRound()
 	cout << "----------------------------------------------" << endl;
 	
 	DealInitialHands();
-	cout << "-------------------------" << endl;
+
 	cout << "Dealer's: " << endl;
 	ViewPlayerGame(&dealer, false);
 	cout << "You: " << endl;
@@ -156,20 +153,23 @@ void Match::OfferSurrender()
 void Match::LetPlayerPlay(bool* winningChance)
 {
 	bool stillPlaying = true;
+	
+	// play all hands
 	while (stillPlaying)
 	{
+		int i{ 0 };
 		for (bool handActive : player.GetHandsStatus())
 		{
 			stillPlaying = (handActive && stillPlaying);
-		}
-		if (stillPlaying)
-		{
-			GetPlay(0, beginningRound, splitable);
+			if (handActive)
+			{
+				GetPlay(&beginningRound, &splitable, i);
+			}
+			i++;
 		}
 	}
 
-	// check if any of the player's hand still has a wiinning chance
-	
+	// check if any of the player's hand still has a wiinning chance	
 	int i{ 0 };
 	for (vector<Card> hand : player.GetHands())
 	{
@@ -182,26 +182,25 @@ void Match::LetPlayerPlay(bool* winningChance)
 void Match::LetHousePlay()
 {
 	dealer.GetCard(0, 0)->Flip();
-	dealer.ViewHands();
+	dealer.ViewSingleHand();
 	while (dealer.GetHandScore() <= 17)
 	{
 		Hit(&dealer);
 	}
 }
 
-void Match::GetPlay(int hand, bool beginningRound, bool splitable)
+void Match::GetPlay(bool* beginningRound, bool* splitable, int hand)
 {
-	// TODO account for multiple hands
-	
 	// get the player's choice of play
-	cout << "Please enter an option" << endl;
-	if (beginningRound) 
+	cout << "Please enter an option" << (player.GetHands().size() > 1 ? " for Hand " + to_string(hand + 1) + ":" : ":") << endl;
+	if (*beginningRound) 
 	{
-		if (splitable)
+		if (*splitable)
 		{
 			cout << "(P) sPlit" << endl;
 		}
 		cout << "(D) Double down" << endl;
+		*beginningRound = false;
 	}
 	cout << "(H) Hit" << endl; 
 	cout << "(S) Stay" << endl;
@@ -213,19 +212,16 @@ void Match::GetPlay(int hand, bool beginningRound, bool splitable)
 	{
 		if ((option == 'P' || option == 'p') && beginningRound && splitable)
 		{
-			cout << "Splitting" << endl;
 			Split();
 			break;
 		}
 		else if (option == 'H' || option == 'h')
 		{
-			cout << "Hitting" << endl;
 			Hit(&player, hand);	
 			break;
 		}
 		else if (option == 'S' || option == 's')
 		{
-			cout << "Staying" << endl;
 			player.Stay(hand);
 			break;
 		}
@@ -257,16 +253,19 @@ void Match::Split()
 	else
 	{
 		cout << "Insuficient credits to split. Please choose another play." << endl;
-		GetPlay(0, beginningRound, splitable);
+		GetPlay(&beginningRound, &splitable, 0);
 	}
 
-	// TODO call hit for each hand
+	int i{0};
+	for (vector<Card> hand : player.GetHands())
+	{
+		Hit(&player, i);
+		i++;
+	}
 }
 
 void Match::FinishRound()
 {
-	
-
 	// reset hands active
 
 	// reset hands
@@ -282,16 +281,15 @@ void Match::FinishRound()
 
 	cout << "------------ Finishing Round ---------------" << endl;
 
-	cout << "House got " << dealer.GetHandScore() << " points" << endl;
-	dealer.ViewHands();
+	cout << "House: " << dealer.GetHandScore() << " points" << endl;
+	dealer.ViewSingleHand();
 	cout << "---------------------" << endl;
-	cout << "You got " << endl;
 
 	int i{ 0 };
 	int dealerRoundResult = dealer.GetHandScore();
 	for (vector<Card> hand : player.GetHands())
 	{
-		cout << "hand " << i + 1 << " --> " << player.GetHandScore(i) << " points" << endl;
+		cout << (player.GetHands().size() > 1 ? "Your Hand " + to_string(i + 1) + ": " : "You: ") << player.GetHandScore(i) << " points" << endl;
 		int handRoundResult = player.GetHandScore(i);
 		int handSize = player.GetSingleHand(i).size();
 		int handResultCheck{ 0 };
@@ -360,7 +358,7 @@ void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 	// loop through As
 	for (int j{ 0 }; j < As; j++)
 	{
-		handScore += DecideAValue(currentPlayer, hand);
+		handScore += DecideAValue(handScore);
 	}
 	
 	// set player's score to the determined value
@@ -399,14 +397,13 @@ int Match::CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand
 
 void Match::ViewPlayerGame(Player* currentPlayer, bool showScore, int hand)
 {
-	cout << "-------------------------" << endl;
-	cout << "Current hand: " << endl;
-	currentPlayer->ViewHands();
+	currentPlayer->GetHands().size() > 1 ? currentPlayer->ViewSingleHand(hand, true) : currentPlayer->ViewSingleHand(hand);
+	
 	if (showScore)
 	{
 		cout << "Hand total: " << currentPlayer->GetHandScore(hand) << endl;
 	}
-	cout << "-------------------------" << endl;
+	cout << "------------------------" << endl;
 }
 
 void Match::PayBet(int playerResult, int hand)
@@ -457,8 +454,8 @@ void Match::PayBet(int playerResult, int hand)
 	}
 }
 
-int Match::DecideAValue(Player* currentPlayer, int hand)
+int Match::DecideAValue(int baseScore)
 {
-	return currentPlayer->GetHandScore(hand) + 11 > 21 ? 1 : 11;
+	return (baseScore + 11 > 21 ? 1 : 11);
 }
 

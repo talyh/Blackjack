@@ -32,7 +32,7 @@ public:
 
 	void LetHousePlay();
 
-	void GetPlay(int hand = 0, bool beginningRound = false, bool splitable = false);
+	void GetPlay(bool* beginningRound, bool* splitable, int hand = 0);
 
 	void Hit(Player* currentPlayer, int hand = 0);
 
@@ -55,7 +55,7 @@ public:
 
 	void PayBet(int playerResult, int hand = 0);
 
-	int DecideAValue(Player* currentPlayer, int hand = 0); // determines whether A should be counted as 1 or 11 and returns that value
+	int DecideAValue(int baseScore); // determines whether A should be counted as 1 or 11 and returns that value
 
 	static const enum GAMESTATUS { notStarted, running, over };
 	
