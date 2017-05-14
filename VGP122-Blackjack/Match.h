@@ -74,7 +74,7 @@ private:
 	Dealer dealer;
 
 	bool beginningRound; // to determine if we're in the first dealing of a round
-	bool finishedRound; // to determine if we should continue offering plays for this round
+	/*bool finishedRound;*/ // to determine if we should continue offering plays for this round
 	bool risky; // to determine if the player should be allowed to take Insurance or Surrender
 	bool splitable; // to determine if the hand can be split
 };

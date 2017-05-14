@@ -37,6 +37,8 @@ public:
 
 	void ViewSingleHand(int hand = 0, bool showHandNumber = false); // shows all cards in a single hand in a text format
 
+	void FinishRound(); // resets the player's hands and hands controls
+
 	static const int INITIAL_HANDS{ 1 };
 	static const int INITIAL_HAND_SIZE{ 2 };
 

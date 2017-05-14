@@ -82,3 +82,11 @@ void Player::ViewSingleHand(int hand, bool showHandNumber)
 		}
 		cout << "------------------------" << endl;
 }
+
+void Player::FinishRound()
+{
+	hands = *(new vector<vector<Card>>(1));
+	handsActive = *(new vector<bool>(1));
+	handsActive[0] = true;
+	handsScore = *(new vector<int>(1));
+}
