@@ -1,7 +1,5 @@
 #include "Match.h"
 
-// TODO BUG dealer's hand A, A, 10 evaluated to 22 (should've been 12)
-
 Match::Match() : gameStatus{ notStarted } 
 { 
 	// assign players to the players vector pointer
@@ -417,17 +415,6 @@ void Match::FinishGame()
 
 void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 {
-	string TEMP;
-	for (Card card : currentPlayer->GetSingleHand(0))
-	{
-		TEMP = (card.GetFaceValue() == 11 ? TEMP + card.GetFace() : TEMP);
-		TEMP = (card.GetFaceValue() == 10 ? TEMP + card.GetFace() : TEMP);
-	}
-	if (TEMP.size() > 3)
-	{
-		cout << "TEMP: " << TEMP << endl;
-	}
-	
 	int handScore{ 0 };
 	int i{ 0 };
 	int As{ 0 };
