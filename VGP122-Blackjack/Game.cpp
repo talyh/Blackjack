@@ -15,6 +15,7 @@ void main()
 	
 	while (match.GetGameStatus() == Match::notStarted)
 	{
+		system("cls");
 		ShowOptions();
 		GetOption();
 	}
@@ -45,7 +46,7 @@ void GetOption()
 				ShowInstructions();
 				break;
 			case 3:
-				system("exit");
+				exit(1);
 				break;
 			default:
 				cout << "Option invalid. Please enter (1), (2) or (3)." << endl;

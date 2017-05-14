@@ -24,11 +24,11 @@ public:
 
 	void GetBet();
 
-	void OfferInsurance();
-
 	void OfferSurrender();
 
-	void LetPlayerPlay(bool* winningChance);
+	void ApplyInsurance();
+
+	void LetPlayerPlay(bool* all21, bool* allBusted);
 
 	void LetHousePlay();
 
@@ -38,9 +38,9 @@ public:
 
 	void Split();
 
-	/*void DoubleDown(); {double bet, hit, stay} */
+	void DoubleDown();
 
-	void FinishRound();
+	void FinishRound(bool surrender = false);
 
 	void FinishGame();
 
@@ -57,7 +57,7 @@ public:
 
 	int DecideAValue(int baseScore); // determines whether A should be counted as 1 or 11 and returns that value
 
-	static const enum GAMESTATUS { notStarted, running, over };
+	const enum GAMESTATUS { notStarted, running, over };
 	
 	static const int numberOfPlayers{ 2 };
 private:
@@ -74,9 +74,12 @@ private:
 	Dealer dealer;
 
 	bool beginningRound; // to determine if we're in the first dealing of a round
-	/*bool finishedRound;*/ // to determine if we should continue offering plays for this round
 	bool risky; // to determine if the player should be allowed to take Insurance or Surrender
 	bool splitable; // to determine if the hand can be split
+	bool dealerPlayed; // to determine whether to show the dealer's score at the end of a round
+	bool finishedRound; // to determine whether the round is stll ongoing
+	bool insuranceApplied; // to indicate whether the player has insurance for that round
+	int insuranceValue; // to store the value of the insurance
 };
 
 #endif

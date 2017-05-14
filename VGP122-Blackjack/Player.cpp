@@ -80,7 +80,6 @@ void Player::ViewSingleHand(int hand, bool showHandNumber)
 				cout << "<< Card is hidden >>" << endl;
 			}
 		}
-		cout << "------------------------" << endl;
 }
 
 void Player::FinishRound()

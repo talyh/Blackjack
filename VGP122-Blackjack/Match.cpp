@@ -1,10 +1,6 @@
 #include "Match.h"
 
-// TODO include Surrender
-// TODO include Insurance
-// TODO include Double Down
-// TODO flip House card on Natural Blackjack
-// TODO review compilation warnings
+// TODO BUG dealer's hand A, A, 10 evaluated to 22 (should've been 12)
 
 Match::Match() : gameStatus{ notStarted } 
 { 
@@ -32,7 +28,6 @@ void Match::StartGame()
 	// shuflle deck
 	deck->Shuffle(SHUFFLES);
 
-	// play
 	cout << "----------------------------------------------" << endl;
 	cout << "                   Welcome !                  " << endl;
 	cout << "----------------------------------------------" << endl;
@@ -49,6 +44,7 @@ void Match::StartGame()
 void Match::PlayRound()
 {
 	beginningRound = true;
+	finishedRound = false;
 
 	cout << "----------------- New Round ------------------" << endl;
 	cout << "You currently have $" << player.GetCredits() << endl;
@@ -58,11 +54,22 @@ void Match::PlayRound()
 	
 	DealInitialHands();
 
-	cout << "Dealer's: " << endl;
+	// if either one of the dealer's cards is an A, the player may surrender or take insurance
+	risky = (dealer.GetSingleHand(0)[1].GetFace() == "A");
+	// if the two first cards in the player's main hand have the same face, they can be split
+	splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
+
+	// show cards
+	cout << "House: " << endl;
 	ViewPlayerGame(&dealer, false);
 	cout << "You: " << endl;
 	ViewPlayerGame(&player);
 	
+	// if dealer has A showing
+	if (risky)
+	{
+		OfferSurrender();
+	}	
 	// if any of the players got a natural blackjack, jump to Finish Round
 	if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
 	{
@@ -73,32 +80,35 @@ void Match::PlayRound()
 	{
 		// player's turn
 		cout << "---------------- Your Turn ------------------" << endl;
-		bool winningChance{ true };
-		// if dealer has A showing, let player have additional options
-		if (risky)
-		{
-			OfferInsurance();
-			OfferSurrender();
-		}
-		LetPlayerPlay(&winningChance);
-
-		if (!winningChance)
-		{
-			// house's turn
-			cout << "-------------- House Turn ------------------" << endl;
-			LetHousePlay();
-		}
 		
-		// finish round
-		FinishRound();
+		if (!finishedRound)
+		{
+			bool all21{ true };
+			bool allBusted{ true };
+			LetPlayerPlay(&all21, &allBusted);
+
+
+			if (!all21 && !allBusted)
+			{
+				// house's turn
+				cout << "-------------- House Turn ------------------" << endl;
+				LetHousePlay();
+			}
+
+			// finish round
+			FinishRound();
+		}
 	}
 	cout << "----------------------------------------------" << endl;	
 }
 
 Card Match::DrawCard() {
-	if (deck->DeckSize() < 1)
+	if (deck->GetDeckSize() < 1)
 	{
+		// create new deck
 		deck = new Deck();
+		// shuflle deck
+		deck->Shuffle(SHUFFLES);
 	}
 	return deck->GetCard();
 }
@@ -113,11 +123,6 @@ void Match::DealInitialHands()
 		}
 		CalculatePlayerScore(players[i]);
 	}
-
-	// if either one of the dealer's cards is an A, the player may surrender or take insurance
-	risky = (dealer.GetSingleHand(0)[1].GetFace() == "A");
-	// if the two first cards in the player's main hand have the same face, they can be split
-	splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
 }
 
 void Match::GetBet()
@@ -146,17 +151,43 @@ void Match::GetBet()
 	}
 }
 
-void Match::OfferInsurance()
-{
-	cout << "Would you like insurance?" << endl;
-}
-
 void Match::OfferSurrender()
 {
-	cout << "SURRENDER NOW!" << endl;
+	cout << "Dealer has an A. Do you wish to surrender? (Y / N)" << endl;
+	char option{};
+
+	while (cin >> option)
+	{
+		if (option == 'Y' || option == 'y')
+		{
+			FinishRound(true);
+			return;
+		}
+		else if (option == 'N' || option == 'n')
+		{
+			ApplyInsurance();
+			return;
+		}
+		else
+		{
+			cout << "Option invalid. Please enter a valid choice." << endl;
+			Common::FlushInput();
+		}
+	}
 }
 
-void Match::LetPlayerPlay(bool* winningChance)
+void Match::ApplyInsurance()
+{
+	if (player.ValidateBet(bets[0], 1.5))
+	{
+		insuranceApplied = true;
+		insuranceValue = (int)round(bets[0] / 2);
+		cout << "Insurance automatically applied to your bet. Additional " << bets[0] / 2 << " colleted." << endl;
+		cout << "If dealer has a Blackjack, you'll get " << bets[0] << " back." << endl;
+	}
+}
+
+void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 {
 	bool stillPlaying = true;
 	
@@ -179,20 +210,27 @@ void Match::LetPlayerPlay(bool* winningChance)
 	int i{ 0 };
 	for (vector<Card> hand : player.GetHands())
 	{
-		bool handBusted = player.GetHandScore(i) > 21;
-		*winningChance = winningChance && handBusted;
+		int handResult = CheckPlayerCards(&player, false, i);
+		bool handWon = (handResult == 2 || handResult == 3);
+		*all21 = (all21 && handWon);
+		bool handBusted = (handResult == 1);
+		*allBusted = (allBusted && handBusted);
 		i++;
 	}
 }
 
 void Match::LetHousePlay()
 {
+	dealerPlayed = true;
 	dealer.GetCard(0, 0)->Flip();
 	dealer.ViewSingleHand();
-	while (dealer.GetHandScore() <= 17)
-	{
-		Hit(&dealer);
-	}
+	/*if (dealer.GetHandScore() <= 17)
+	{*/
+		while (dealer.GetHandScore() < 17)
+		{
+			Hit(&dealer);
+		}
+	//}
 }
 
 void Match::GetPlay(bool* beginningRound, bool* splitable, int hand)
@@ -206,7 +244,6 @@ void Match::GetPlay(bool* beginningRound, bool* splitable, int hand)
 			cout << "(P) sPlit" << endl;
 		}
 		cout << "(D) Double down" << endl;
-		*beginningRound = false;
 	}
 	cout << "(H) Hit" << endl; 
 	cout << "(S) Stay" << endl;
@@ -216,14 +253,19 @@ void Match::GetPlay(bool* beginningRound, bool* splitable, int hand)
 	// direct play to the proper course, ensuring only valid plays are selectable
 	while (cin >> option)
 	{
-		if ((option == 'P' || option == 'p') && beginningRound && splitable)
+		if ((option == 'P' || option == 'p') && *beginningRound && *splitable)
 		{
 			Split();
 			break;
 		}
+		else if ((option == 'D' || option == 'd') && *beginningRound)
+		{
+			DoubleDown();
+			break;
+		}
 		else if (option == 'H' || option == 'h')
 		{
-			Hit(&player, hand);	
+			Hit(&player, hand);
 			break;
 		}
 		else if (option == 'S' || option == 's')
@@ -237,6 +279,7 @@ void Match::GetPlay(bool* beginningRound, bool* splitable, int hand)
 			Common::FlushInput();
 		}
 	}
+	*beginningRound = false;
 }
 
 void Match::Hit(Player* currentPlayer, int hand)
@@ -249,8 +292,9 @@ void Match::Hit(Player* currentPlayer, int hand)
 
 void Match::Split()
 {
-	if (player.ValidateBet(bets[0], 2))
+	if (player.ValidateBet(bets[0], 4))
 	{
+		bets[0] *= 2;
 		bets.push_back(bets[0]);
 		roundCredits = player.GetCredits() - (bets[0] * 2);
 		cout << "Now betting $" << bets[0] << " on each hand" << endl;
@@ -270,62 +314,87 @@ void Match::Split()
 	}
 }
 
-void Match::FinishRound()
+void Match::DoubleDown()
+{
+	if (player.ValidateBet(bets[0], 2))
+	{
+		bets[0] *= 2;
+		cout << "Bet of $" << bets[0] / 2 << " doubled. Current bet is $" << bets[0] << endl;
+		Hit(&player);
+		player.Stay();
+	}
+	else
+	{
+		cout << "Insuficient credits to double. Please choose another play." << endl;
+		GetPlay(&beginningRound, &splitable, 0);
+	}
+}
+
+void Match::FinishRound(bool surrender)
 {
 	cout << "------------ Finishing Round ---------------" << endl;
-
-	cout << "House: " << dealer.GetHandScore() << " points" << endl;
-	dealer.ViewSingleHand();
-	cout << "---------------------" << endl;
-
-	int i{ 0 };
-	int dealerRoundResult = dealer.GetHandScore();
-	for (vector<Card> hand : player.GetHands())
+	if (!surrender)
 	{
-		cout << (player.GetHands().size() > 1 ? "Your Hand " + to_string(i + 1) + ": " : "You: ") << player.GetHandScore(i) << " points" << endl;
-		int handRoundResult = player.GetHandScore(i);
-		int handSize = player.GetSingleHand(i).size();
-		int handResultCheck{ 0 };
-		if (handRoundResult > 21)
+		cout << "--------- House ---------" << endl;
+		if (dealer.GetCard(0, 0)->GetFaceUp() == false)
 		{
-			handResultCheck = 0; // player busted
-		} 
-		else if (dealerRoundResult > 21)
-		{
-			handResultCheck = 1; // dealer busted
+			dealer.GetCard(0, 0)->Flip();
 		}
-		else if (handRoundResult == 21 && handSize == 2)
-		{ 
-			handResultCheck = 2; // player's blackjack
-		}
-		else if (handRoundResult == 21 && handSize > 2)
+		ViewPlayerGame(&dealer, ((dealerPlayed || CheckPlayerCards(&dealer, &beginningRound) == 2) ? true : false));
+
+		cout << "---------- You ----------" << endl;
+		int i{ 0 };
+		int dealerRoundResult = dealer.GetHandScore();
+		for (vector<Card> hand : player.GetHands())
 		{
-			handResultCheck = 3; // player's long 21
-		}
-		else if (handRoundResult > dealerRoundResult)
-		{
-			handResultCheck = 4; // player got closer to 21
-		}
-		else if (handRoundResult < dealerRoundResult)
-		{
-			handResultCheck = 5; // dealer got closer to 21
-			if (dealer.GetCard(0, 0)->GetFaceUp() == false)
+			ViewPlayerGame(&player, true, i);
+			int handRoundResult = player.GetHandScore(i);
+			int handSize = player.GetSingleHand(i).size();
+			int handResultCheck{ 0 };
+			if (handRoundResult > 21)
 			{
-				dealer.GetCard(0, 0)->Flip();
+				handResultCheck = 0; // player busted
 			}
+			else if (dealerRoundResult > 21)
+			{
+				handResultCheck = 1; // dealer busted
+			}
+			else if (handRoundResult == 21 && handSize == 2)
+			{
+				handResultCheck = 2; // player's blackjack
+			}
+			else if (handRoundResult == 21 && handSize > 2)
+			{
+				handResultCheck = 3; // player's long 21
+			}
+			else if (handRoundResult > dealerRoundResult)
+			{
+				handResultCheck = 4; // player got closer to 21
+			}
+			else if (handRoundResult < dealerRoundResult)
+			{
+				handResultCheck = 5; // dealer got closer to 21
+			}
+			else if (handRoundResult == dealerRoundResult)
+			{
+				handResultCheck = 6; // tie
+			}
+			else
+			{
+				handResultCheck = 100; // something wrong happened
+			}
+			PayBet(handResultCheck, i);
+			i++;
+			cout << "-------------------------" << endl;
 		}
-		else if (handRoundResult == dealerRoundResult)
+		if (insuranceApplied)
 		{
-			handResultCheck = 6; // tie
-		}
-		else
-		{
-			handResultCheck = 100; // something wrong happened
-		}
-		cout << "----------------" << endl;
-		PayBet(handResultCheck, i);
-		i++;
-		cout << "----------------------" << endl;
+			dealerRoundResult == 21 ? PayBet(8) : PayBet(9);
+		} 
+	}
+	else
+	{
+		PayBet(7);
 	}
 
 	// reset round controls
@@ -335,6 +404,9 @@ void Match::FinishRound()
 	{
 		currentPlayer->FinishRound();
 	}
+	dealerPlayed = false;
+	finishedRound = true;
+	insuranceApplied = false;
 }
 
 void Match::FinishGame()
@@ -345,6 +417,17 @@ void Match::FinishGame()
 
 void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 {
+	string TEMP;
+	for (Card card : currentPlayer->GetSingleHand(0))
+	{
+		TEMP = (card.GetFaceValue() == 11 ? TEMP + card.GetFace() : TEMP);
+		TEMP = (card.GetFaceValue() == 10 ? TEMP + card.GetFace() : TEMP);
+	}
+	if (TEMP.size() > 3)
+	{
+		cout << "TEMP: " << TEMP << endl;
+	}
+	
 	int handScore{ 0 };
 	int i{ 0 };
 	int As{ 0 };
@@ -410,7 +493,7 @@ void Match::ViewPlayerGame(Player* currentPlayer, bool showScore, int hand)
 	{
 		cout << "Hand total: " << currentPlayer->GetHandScore(hand) << endl;
 	}
-	cout << "------------------------" << endl;
+	cout << "-------------------------" << endl;
 }
 
 void Match::PayBet(int playerResult, int hand)
@@ -420,15 +503,15 @@ void Match::PayBet(int playerResult, int hand)
 		case 0: // player busted
 		case 5: // dealer closer to 21
 		{
-			cout << "Bet of $" << bets[hand] << " payed to the House" << endl;
+			cout << "Collecting $" << bets[hand] << endl;
 			player.AdjustCredits(-bets[hand]);
 			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break; 
 		}
 		case 2: // player's blackjack
 		{
-			double pay = bets[hand] * 1.5;
-			cout << "Receiving $" << pay << endl;
+			int pay{ (int)round(bets[hand] * 1.5) };
+			cout << "Receiving $" << abs(pay) << endl;
 			player.AdjustCredits(pay);
 			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break; 
@@ -437,15 +520,39 @@ void Match::PayBet(int playerResult, int hand)
 		case 3: // player's long 21
 		case 4: // player closer to 21
 		{
-			double pay = bets[hand] * 2.5;
-			cout << "Receiving $" << pay << endl;
+			int pay{ (int)round(bets[hand] * 2.5) };
+			cout << "Receiving $" << abs(pay) << endl;
 			player.AdjustCredits(pay);
 			cout << "Current Credits: $" << player.GetCredits() << endl; 
 			break;
 		}
 		case 6: // tie
 		{
-			cout << "Tie. No credits collected or payed." << endl;
+			cout << "Tie. No credits collected or received." << endl;
+			cout << "Current Credits: $" << player.GetCredits() << endl;
+			break;
+		}
+		case 7: // surrender
+		{
+			int pay{ -(int)round(bets[0] / 2) };
+			player.AdjustCredits(pay);
+			cout << "Receiving $" << abs(pay) << " back" << endl;
+			cout << "Current Credits: $" << player.GetCredits() << endl;
+			break;
+		}
+		case 8: // insurance applied & dealer got BlackJack
+		{	
+			int pay{ (int)(insuranceValue * 2)  };
+			player.AdjustCredits(pay);
+			cout << "Receiving $" << abs(pay) << " from insurance" << endl;
+			cout << "Current Credits: $" << player.GetCredits() << endl;
+			break; 
+		}
+		case 9: // insurance applied and dealer didn't get a Blackjack
+		{
+			int pay{ (int)-insuranceValue };
+			player.AdjustCredits(pay);
+			cout << "Collecting $" << abs(pay) << " from insurance" << endl;
 			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break;
 		}

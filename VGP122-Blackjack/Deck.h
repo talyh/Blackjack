@@ -12,9 +12,8 @@ public:
 
 	const Card GetCard();
 
-	int DeckSize();
+	int GetDeckSize();
 
-	void TEMP_ShowDeck();
 
 private:
 	vector<Card> cards;
