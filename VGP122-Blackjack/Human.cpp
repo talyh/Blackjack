@@ -29,3 +29,14 @@ void Human::AdjustCredits(int amount)
 {
 	credits += amount;
 }
+
+bool Human::GetSplitable()
+{
+	DetermineSplitable();
+	return splitableHand;
+}
+
+void Human::DetermineSplitable()
+{
+	splitableHand = hands[0][0].GetFace() == hands[0][1].GetFace();
+}

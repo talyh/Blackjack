@@ -1,3 +1,9 @@
+// TODO adjust A points calculation to account for a second A that impacts a previous one (like 10, A, A)
+// TODO move action methods to Player
+// TODO review PlayRound for shortness improvements
+// TODO review dynamic memory allocation cleanup
+// TODO review protection levels
+
 #include "Common.h"
 #include "Instructions.h"
 #include "Match.h"
@@ -34,24 +40,24 @@ void ShowOptions()
 void GetOption()
 {
 	int option{ 0 };
-	while (option < 1 || option > 3)
+	do
 	{
 		cin >> option;
 		switch (option)
 		{
 			case 1:
-				match.StartGame();
+				match.PlayGame(); // Play Game
 				break;
 			case 2:
-				ShowInstructions();
+				ShowInstructions(); // Show instructions
 				break;
 			case 3:
-				exit(1);
+				exit(1); // Quit
 				break;
 			default:
 				cout << "Option invalid. Please enter (1), (2) or (3)." << endl;
-				Common::FlushInput();
+				Common::FlushInput(); // Clear input to allow loop to rerun
 				break;
 		}
-	}
+	} while (option < 1 || option > 3);
 }

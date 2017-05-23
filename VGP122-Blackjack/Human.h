@@ -19,8 +19,14 @@ public:
 
 	static const int INITIAL_CREDITS{ 500 };
 
+	bool GetSplitable();
+
 private:
 	int credits;
+
+	int splitableHand;
+
+	void DetermineSplitable();
 };
 
 #endif // !PLAYER_H

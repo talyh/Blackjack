@@ -127,7 +127,7 @@
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="Dealer.cpp" />
     <ClCompile Include="Deck.cpp" />
-    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Blackjack.cpp" />
     <ClCompile Include="Human.cpp" />
     <ClCompile Include="Instructions.cpp" />
     <ClCompile Include="Match.cpp" />

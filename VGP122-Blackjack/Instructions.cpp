@@ -1,7 +1,5 @@
 #include "Instructions.h"
 
-// TODO write instructions
-
 void ShowInstructions()
 {
 	system("cls");
