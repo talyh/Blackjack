@@ -416,7 +416,7 @@ void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 {
 	int handScore{ 0 };
 	int i{ 0 };
-	int As{ 0 };
+	int aces{ 0 };
 	for (Card card : currentPlayer->GetSingleHand(hand))
 	{
 		// loop through regular cards first to assess how As should behave
@@ -426,15 +426,23 @@ void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 		}
 		else
 		{
-			As++;
+			aces++;
 		}
 		i++;
 	}
 
-	// loop through As
-	for (int j{ 0 }; j < As; j++)
+
+	// if the accumulated Aces would bust the player's hand, count them as 1
+	if (handScore + aces * 11 > 21)
 	{
-		handScore += DecideAValue(handScore);
+		handScore += aces;
+	}
+	else // loop through Aces, determining a value for each
+	{
+		for (int j{ 0 }; j < aces; j++)
+		{
+			handScore += DecideAValue(handScore);
+		}
 	}
 	
 	// set player's score to the determined value

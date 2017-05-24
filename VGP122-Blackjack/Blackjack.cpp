@@ -1,4 +1,3 @@
-// TODO adjust A points calculation to account for a second A that impacts a previous one (like 10, A, A)
 // TODO move action methods to Player
 // TODO review PlayRound for shortness improvements
 // TODO review dynamic memory allocation cleanup
