@@ -50,11 +50,6 @@ int Player::GetHandScore(int hand)
 	return handsScore[hand];
 }
 
-string Player::GetPlayerType()
-{
-	return type;
-}
-
 void Player::SetHandStatus(int hand, bool handStatus)
 {
 	handsActive[hand] = handStatus;
@@ -88,4 +83,18 @@ void Player::FinishRound()
 	handsActive = *(new vector<bool>(1));
 	handsActive[0] = true;
 	handsScore = *(new vector<int>(1));
+}
+
+void Player::ShowHiddenCards()
+{
+	for (size_t i{ 0 }; i < hands.size(); i++)
+	{
+		for (size_t j{ 0 }; j < hands[i].size(); j++)
+		{
+			if (!hands[i][j].GetFaceUp())
+			{
+				hands[i][j].Flip();
+			}
+		}
+	}
 }

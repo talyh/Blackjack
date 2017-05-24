@@ -222,7 +222,7 @@ void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 void Match::LetHousePlay()
 {
 	dealerPlayed = true;
-	dealer.GetCard(0, 0)->Flip();
+	dealer.ShowHiddenCards();
 	dealer.ViewSingleHand();
 	while (dealer.GetHandScore() < 17)
 	{
@@ -333,10 +333,7 @@ void Match::FinishRound(bool surrender)
 	if (!surrender)
 	{
 		cout << "--------- House ---------" << endl;
-		if (dealer.GetCard(0, 0)->GetFaceUp() == false)
-		{
-			dealer.GetCard(0, 0)->Flip();
-		}
+		dealer.ShowHiddenCards();
 		ViewPlayerGame(&dealer, ((dealerPlayed || CheckPlayerCards(&dealer, &beginningRound) == 2) ? true : false));
 
 		cout << "---------- You ----------" << endl;
