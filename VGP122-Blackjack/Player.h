@@ -13,7 +13,6 @@ public:
 	
 	void Stay(int hand = 0);
 
-	//Card GetCard(int hand, int position);
 	Card* GetCard(int hand, int position);
 
 	vector<Card> GetSingleHand(int hand); // returns the raw vector of one of the player's hands
@@ -25,8 +24,6 @@ public:
 									// TRUE for a hand that is still playing
 
 	int GetHandScore(int hand = 0); // returns the current points accumulated for a given hand
-
-	string GetPlayerType(); // returns the type of player (guest or dealer)
 	
 	void SetHandStatus(int hand, bool handStatus); // sets the status of a hand
 												   // FALSE for a hand that has finished playing
@@ -38,6 +35,8 @@ public:
 	void ViewSingleHand(int hand = 0, bool showHandNumber = false); // shows all cards in a single hand in a text format
 
 	void FinishRound(); // resets the player's hands and hands controls
+
+	void ShowHiddenCards();
 
 	static const int INITIAL_HANDS{ 1 };
 	static const int INITIAL_HAND_SIZE{ 2 };

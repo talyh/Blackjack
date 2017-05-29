@@ -18,7 +18,7 @@ int Match::GetGameStatus()
 	return gameStatus;
 }
 
-void Match::StartGame()
+void Match::PlayGame()
 {
 	system("cls");
 	gameStatus = running;
@@ -51,11 +51,14 @@ void Match::PlayRound()
 	cout << "----------------------------------------------" << endl;
 	
 	DealInitialHands();
+	
+	for (Player* p : players)
+	{
+		CalculatePlayerScore(p);
+	}
 
-	// if either one of the dealer's cards is an A, the player may surrender or take insurance
-	risky = (dealer.GetSingleHand(0)[1].GetFace() == "A");
 	// if the two first cards in the player's main hand have the same face, they can be split
-	splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
+	//splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
 
 	// show cards
 	cout << "House: " << endl;
@@ -63,8 +66,8 @@ void Match::PlayRound()
 	cout << "You: " << endl;
 	ViewPlayerGame(&player);
 	
-	// if dealer has A showing
-	if (risky)
+	// if dealer has a risky hand
+	if (dealer.GetHandRisk())
 	{
 		OfferSurrender();
 	}	
@@ -119,7 +122,6 @@ void Match::DealInitialHands()
 		{
 			dealer.DealCard(DrawCard(), players[i]);
 		}
-		CalculatePlayerScore(players[i]);
 	}
 }
 
@@ -198,7 +200,7 @@ void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 			stillPlaying = (handActive && stillPlaying);
 			if (handActive)
 			{
-				GetPlay(&beginningRound, &splitable, i);
+				GetPlay(&beginningRound, player.GetSplitable() , i);
 			}
 			i++;
 		}
@@ -220,24 +222,21 @@ void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 void Match::LetHousePlay()
 {
 	dealerPlayed = true;
-	dealer.GetCard(0, 0)->Flip();
+	dealer.ShowHiddenCards();
 	dealer.ViewSingleHand();
-	/*if (dealer.GetHandScore() <= 17)
-	{*/
-		while (dealer.GetHandScore() < 17)
-		{
-			Hit(&dealer);
-		}
-	//}
+	while (dealer.GetHandScore() < 17)
+	{
+		Hit(&dealer);
+	}
 }
 
-void Match::GetPlay(bool* beginningRound, bool* splitable, int hand)
+void Match::GetPlay(bool* beginningRound, bool splitable, int hand)
 {
 	// get the player's choice of play
 	cout << "Please enter an option" << (player.GetHands().size() > 1 ? " for Hand " + to_string(hand + 1) + ":" : ":") << endl;
 	if (*beginningRound) 
 	{
-		if (*splitable)
+		if (splitable)
 		{
 			cout << "(P) sPlit" << endl;
 		}
@@ -251,7 +250,7 @@ void Match::GetPlay(bool* beginningRound, bool* splitable, int hand)
 	// direct play to the proper course, ensuring only valid plays are selectable
 	while (cin >> option)
 	{
-		if ((option == 'P' || option == 'p') && *beginningRound && *splitable)
+		if ((option == 'P' || option == 'p') && *beginningRound && splitable)
 		{
 			Split();
 			break;
@@ -301,7 +300,7 @@ void Match::Split()
 	else
 	{
 		cout << "Insuficient credits to split. Please choose another play." << endl;
-		GetPlay(&beginningRound, &splitable, 0);
+		GetPlay(&beginningRound, player.GetSplitable(), 0);
 	}
 
 	int i{0};
@@ -324,7 +323,7 @@ void Match::DoubleDown()
 	else
 	{
 		cout << "Insuficient credits to double. Please choose another play." << endl;
-		GetPlay(&beginningRound, &splitable, 0);
+		GetPlay(&beginningRound, player.GetSplitable(), 0);
 	}
 }
 
@@ -334,10 +333,7 @@ void Match::FinishRound(bool surrender)
 	if (!surrender)
 	{
 		cout << "--------- House ---------" << endl;
-		if (dealer.GetCard(0, 0)->GetFaceUp() == false)
-		{
-			dealer.GetCard(0, 0)->Flip();
-		}
+		dealer.ShowHiddenCards();
 		ViewPlayerGame(&dealer, ((dealerPlayed || CheckPlayerCards(&dealer, &beginningRound) == 2) ? true : false));
 
 		cout << "---------- You ----------" << endl;
@@ -417,7 +413,7 @@ void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 {
 	int handScore{ 0 };
 	int i{ 0 };
-	int As{ 0 };
+	int aces{ 0 };
 	for (Card card : currentPlayer->GetSingleHand(hand))
 	{
 		// loop through regular cards first to assess how As should behave
@@ -427,15 +423,23 @@ void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 		}
 		else
 		{
-			As++;
+			aces++;
 		}
 		i++;
 	}
 
-	// loop through As
-	for (int j{ 0 }; j < As; j++)
+
+	// if the accumulated Aces would bust the player's hand, count them as 1
+	if (handScore + aces * 11 > 21)
 	{
-		handScore += DecideAValue(handScore);
+		handScore += aces;
+	}
+	else // loop through Aces, determining a value for each
+	{
+		for (int j{ 0 }; j < aces; j++)
+		{
+			handScore += DecideAValue(handScore);
+		}
 	}
 	
 	// set player's score to the determined value

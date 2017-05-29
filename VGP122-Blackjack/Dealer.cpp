@@ -25,4 +25,19 @@ void Dealer::ReceiveCard(Card card, int hand)
 	hands[hand].push_back(card);
 }
 
+bool Dealer::GetHandRisk()
+{
+	DetermineRiskyHand();
+	return riskyHand;
+}
+
+void Dealer::DetermineRiskyHand()
+{
+	for (Card c : hands[0])
+	{
+		// if the dealer has an Ace showing, their hand is risky
+		riskyHand = (c.GetFace() == "A" && c.GetFaceUp() == true);
+	}
+}
+
 

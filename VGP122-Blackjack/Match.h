@@ -14,7 +14,7 @@ public:
 
 	int GetGameStatus();
 
-	void StartGame();
+	void PlayGame();
 
 	void PlayRound();
 
@@ -32,7 +32,7 @@ public:
 
 	void LetHousePlay();
 
-	void GetPlay(bool* beginningRound, bool* splitable, int hand = 0);
+	void GetPlay(bool* beginningRound, bool splitable, int hand = 0);
 
 	void Hit(Player* currentPlayer, int hand = 0);
 
@@ -74,8 +74,6 @@ private:
 	Dealer dealer;
 
 	bool beginningRound; // to determine if we're in the first dealing of a round
-	bool risky; // to determine if the player should be allowed to take Insurance or Surrender
-	bool splitable; // to determine if the hand can be split
 	bool dealerPlayed; // to determine whether to show the dealer's score at the end of a round
 	bool finishedRound; // to determine whether the round is stll ongoing
 	bool insuranceApplied; // to indicate whether the player has insurance for that round
