@@ -8,6 +8,10 @@
 #include <random>
 #include <array>
 #include <cstdlib>
+#include <sdl.h>
+#include <sdl_image.h>
+#include <sdl_ttf.h>
+#include <sdl_mixer.h>
 
 using namespace std;
 

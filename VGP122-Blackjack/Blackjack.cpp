@@ -14,8 +14,17 @@ void GetOption();
 
 Match match;
 
-void main()
+int main(int argc, char** argv)
 {
+	/** Initialize SDL */
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
+	{
+		cerr << "Unable to init SDL: " << SDL_GetError() << endl;
+		return 1;
+	}
+	// Close SDL at program end
+	atexit(SDL_Quit);
+	
 	srand(static_cast<unsigned int>(time(0)));
 	
 	while (match.GetGameStatus() == Match::notStarted)
@@ -24,6 +33,8 @@ void main()
 		ShowOptions();
 		GetOption();
 	}
+
+	return 0;
 }
 
 void ShowOptions() 
