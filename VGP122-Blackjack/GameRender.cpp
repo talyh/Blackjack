@@ -10,33 +10,7 @@ TTF_Font *font = NULL; // the font we'll use throughout the game
 
 Mix_Music *music = NULL; // the music listener to be used throughout the game
 
-GameRender::GameRender()
-{
-}
-
-GameRender::~GameRender()
-{
-	for (void* item : itemsCreated)
-	{
-		//itemsCreated.at(0) = nullptr;
-		delete item;
-	}
-
-	// free text
-	//SDL_FreeSurface(text);
-	//SDL_DestroyTexture(scoreTexture);
-	TTF_CloseFont(font);
-
-	// free Music
-	//Mix_HaltMusic();
-	//Mix_FreeMusic(music);
-
-	// free SDL
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
-}
-
-int GameRender::Initialize()
+int GameRender::Initialize(string gameFont, int fontSize)
 {
 	/** Initialize SDL */
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
@@ -85,7 +59,7 @@ int GameRender::Initialize()
 	atexit(TTF_Quit);
 
 	// open font
-	font = TTF_OpenFont("fnts/l_10646.ttf", 36);
+	font = TTF_OpenFont(gameFont.c_str(), fontSize);
 	if (!font)
 	{
 		cerr << "TTF_OpenFont Error: " << TTF_GetError() << endl;
@@ -122,7 +96,7 @@ void GameRender::SetMusic(string musicPath)
 	}
 	else
 	{
-		cout << "Playing music " << music << endl;
+		cout << "Playing music " << musicPath << endl;
 	}
 
 	// play music
@@ -155,6 +129,27 @@ void GameRender::DrawElement(string filename, int xPos, int yPos, int width, int
 	SDL_RenderPresent(renderer);
 }
 
+void GameRender::DrawElement(Sprite* image, int xPos, int yPos, int width, int height)
+{
+	if (image)
+	{
+		// reposition and ensure image is visible
+		image->setXPos(xPos);
+		image->setYPos(yPos);
+		image->setVisible(true);
+
+		// send the sprite to the renderer
+		image->draw(renderer);
+
+		// redraw the renderer
+		SDL_RenderPresent(renderer);
+	}
+	else
+	{
+		cout << "Cannot get image to draw" << endl;
+	}
+}
+
 void GameRender::PrintText(string text, int xPos, int yPos, int size, SDL_Color color)
 {
 	cout << "Printing text " << text << endl;
@@ -169,7 +164,7 @@ void GameRender::PrintText(string text, int xPos, int yPos, int size, SDL_Color 
 	TTF_SetFontStyle(font, TTF_STYLE_BOLD | TTF_STYLE_ITALIC);
 
 	// set message for text
-	textbox = TTF_RenderText_Blended(font, text.c_str(), textColor);
+	textbox = TTF_RenderText_Blended_Wrapped(font, text.c_str(), textColor, SCREEN_WIDTH - xPos);
 
 	// convert the text to image
 	scoreTexture = SDL_CreateTextureFromSurface(renderer, textbox);
@@ -223,7 +218,15 @@ void GameRender::ClearScreen()
 void GameRender::Finish()
 {
 	// clean items created
-	
+	for (void* item : itemsCreated)
+	{
+		delete item;
+		item = nullptr;
+	}
+
+	// free text resources
+	TTF_CloseFont(font);
+
 	// free audio resources
 	Mix_HaltMusic();
 	Mix_FreeMusic(music);

@@ -23,7 +23,7 @@ struct ButtonSize
 	int width;
 	int heigth;
 };
-ButtonSize startMenuButtons{ 383, 78 };
+const ButtonSize START_MENU_BUTTON { 383, 78 };
 
 // protoype functions
 void ListenForGameEvents(bool listening);
@@ -38,7 +38,7 @@ const string BTN_INSTRUCTIONS_IMAGE = "imgs/btnInstructions.png";
 const string BTN_QUIT_IMAGE = "imgs/btnQuit.png";
 // audio
 const string MUSIC = "snds/music.mid";
-const string SFX_BUTTON_CLICK = "snds/smb3_powerup.mp3";
+const string SFX_BUTTON_CLICK = "snds/jump.wav";
 const string SFX_START = "snds/";
 const string SFX_BET = "sdns/";
 const string SFX_HIT = "sdns/";
@@ -48,7 +48,9 @@ const string SFX_DOUBLE_DOWN = "sdns/";
 const string SFX_RECEIVE_BET = "sdns/";
 const string SFX_PAY_BET = "sdns/";
 const string SFX_GAME_OVER = "sdns/";
-
+// font
+const string FONT = "fnts/amer_typewriter.ttf";
+const int FONT_SIZE = 32;
 
 /*
 
@@ -84,7 +86,7 @@ int main(int argc, char** argv)
 	bool gameRunning = true;
 
 	// initialize graphical and visual elements
-	GameRender::Initialize();
+	GameRender::Initialize(FONT, FONT_SIZE);
 
 	// draw the Start Menu window
 	GameRender::SetBackground(BACKGROUND_IMAGE);
@@ -166,30 +168,20 @@ void ListenForGameEvents(bool listening)
 
 void LoadStartMenu()
 {
-	GameRender::DrawElement(BTN_PLAY_IMAGE, 170, 100, startMenuButtons.width, startMenuButtons.heigth, &btnStart);
-	GameRender::DrawElement(BTN_INSTRUCTIONS_IMAGE, 170, 198, startMenuButtons.width, startMenuButtons.heigth, &btnInstructions);
-	GameRender::DrawElement(BTN_QUIT_IMAGE, 170, 296, startMenuButtons.width, startMenuButtons.heigth, &btnQuit);
+	GameRender::DrawElement(BTN_PLAY_IMAGE, 170, 100, START_MENU_BUTTON.width, START_MENU_BUTTON.heigth, &btnStart);
+	GameRender::DrawElement(BTN_INSTRUCTIONS_IMAGE, 170, 198, START_MENU_BUTTON.width, START_MENU_BUTTON.heigth, &btnInstructions);
+	GameRender::DrawElement(BTN_QUIT_IMAGE, 170, 296, START_MENU_BUTTON.width, START_MENU_BUTTON.heigth, &btnQuit);
 }
 
 void ShowInstructions()
 {
-	//cout << "------------------------------------" << endl;
-	/*cout << "Instuctions for Blackjack" << endl;
-	cout << "------------------------------------" << endl;
-	cout << "PLease visit Wikipedia for rules" << endl;
-	cout << "https://en.wikipedia.org/wiki/Blackjack" << endl;
-	cout << "------------------------------------" << endl;
-	cout << "Press any key to return to the main menu" << endl;
-	char input{};
-	if (cin >> input)
-	{
-		return;
-	}*/
+	// show text
+	GameRender::PrintText("Instructions for Blackjack", 10, 100, 20, { 211, 204, 188 });
+	GameRender::PrintText("Please visit Wikipedia for rules \nhttps://en.wikipedia.org/wiki/Blackjack", 10, 160, 20, {189, 211, 188});
 
-	// set the text properties
-
-	GameRender::PrintText("Instructions for Blackjack", 0, 0);
-	//GameRender::PrintText("\n", 100, 130);
+	// show buttons
+	GameRender::DrawElement(btnStart, 100, 400);
+	GameRender::DrawElement(btnQuit, 100, 400 + START_MENU_BUTTON.heigth + 20);
 }
 
 

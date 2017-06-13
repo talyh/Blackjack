@@ -5,11 +5,8 @@
 #include "Sprite.h"
 
 class GameRender {
-public:
-	GameRender();
-	~GameRender();
-	
-	static int Initialize();
+public:	
+	static int Initialize(string gameFont, int fontSize);
 
 	static void SetBackground(string backgroundImagePath);
 
@@ -18,6 +15,8 @@ public:
 	static void DrawBackground();
 
 	static void DrawElement(string filename, int xPos, int yPos, int width, int height, Sprite** elementPtr);
+
+	static void DrawElement(Sprite* image, int xPos, int yPos, int width = 0, int height = 0);
 
 	static void PrintText(string text, int xPos, int yPos, int size = 20, SDL_Color color = { 0, 0, 0});
 
