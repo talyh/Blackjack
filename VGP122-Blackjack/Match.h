@@ -21,7 +21,7 @@ public:
 
 	void PlayRound();
 
-	Card DrawCard();
+	Card* DrawCard();
 
 	void DealInitialHands();
 
@@ -67,9 +67,7 @@ public:
 	const int initialBet { 10 };
 	const int betIncrement { 10 };
 
-private:
-	void SetBet(int delta, int betPosition = 0);
-	
+private:	
 	const size_t SHUFFLES{ 100 }; // to determine how many times a deck should be shuffled on start
 	GAMESTATUS gameStatus; // to keep track of the game status and flow
 	Deck* deck; // to represent the deck of cards in use, can be replaced if the deck finishes

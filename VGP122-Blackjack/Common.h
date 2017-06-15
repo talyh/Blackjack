@@ -12,6 +12,7 @@
 #include <sdl_image.h>
 #include <sdl_ttf.h>
 #include <sdl_mixer.h>
+#include "Size.h"
 
 using namespace std;
 
@@ -20,16 +21,62 @@ using namespace std;
 #define CARD_WIDTH CARD_H::SIZE.width
 #define CARD_HEIGHT CARD_H::SIZE.height
 
-struct Size
-{
-	int width { 0 };
-	int height { 0 };
-};
-
 struct Position
 {
 	int xPos { 0 };
 	int yPos { 0 };
+
+	Position& Position::operator+= (const int rhs)
+	{
+		xPos += rhs;
+		yPos += rhs;
+		return *this;
+	}
+	friend Position operator+(const Position & lhs, const int & rhs)
+	{
+		Position z = lhs;
+		z += rhs;
+		return z;
+	}
+
+	Position& Position::operator-= (const int rhs)
+	{
+		xPos -= rhs;
+		yPos -= rhs;
+		return *this;
+	}
+	friend Position operator-(const Position & lhs, const int & rhs)
+	{
+		Position z = lhs;
+		z -= rhs;
+		return z;
+	}
+
+	Position& Position::operator*= (const int rhs)
+	{
+		xPos *= rhs;
+		yPos *= rhs;
+		return *this;
+	}
+	friend Position operator*(const Position & lhs, const int & rhs)
+	{
+		Position z = lhs;
+		z *= rhs;
+		return z;
+	}
+
+	Position& Position::operator/= (const int rhs)
+	{
+		xPos /= rhs;
+		yPos /= rhs;
+		return *this;
+	}
+	friend Position operator/(const Position & lhs, const int & rhs)
+	{
+		Position z = lhs;
+		z /= rhs;
+		return z;
+	}
 };
 
 struct Textbox 
@@ -49,6 +96,7 @@ struct Button
 	Size size { 0, 0 };
 	string src { "" };
 	Sprite* image{ nullptr };
+	string sfxSrc { "" };
 };
 
 // define layout variables

@@ -16,6 +16,7 @@ const Position AVATAR_POSITION {
 	PADDING , 
 	SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING 
 };
+
 // credits
 Textbox lblPlayerCredits {
 	"lblPlayerCredits",
@@ -75,8 +76,12 @@ Button btnBetConfirm1{
 	BTN_BET_CONFIRM_IMAGE,
 	NULL
 };
-Position dealerHand { SCREEN_WIDTH / 2 - CARD_WIDTH - PADDING, PADDING };
-Position playerHand { SCREEN_WIDTH / 2 - CARD_WIDTH - PADDING, SCREEN_HEIGHT - CARD_HEIGHT - PADDING * 4 };
+
+// hands
+const int CARD_PADDING { 15 };
+const Position DEALER_HAND { SCREEN_WIDTH / 2 - CARD_WIDTH , PADDING };
+const Position PLAYER_HAND { SCREEN_WIDTH / 2 - CARD_WIDTH, SCREEN_HEIGHT - CARD_HEIGHT - PADDING * 4 };
+
 
 
 Match::Match() : gameStatus{ notStarted } 
@@ -215,7 +220,7 @@ void Match::PlayRound()
 	//cout << "----------------------------------------------" << endl;	
 }
 
-Card Match::DrawCard() {
+Card* Match::DrawCard() {
 	if (deck->GetDeckSize() < 1)
 	{
 		// create new deck
@@ -223,6 +228,7 @@ Card Match::DrawCard() {
 		// shuflle deck
 		deck->Shuffle(SHUFFLES);
 	}
+
 	return deck->GetCard();
 }
 
@@ -232,16 +238,9 @@ void Match::DealInitialHands()
 	{
 		for (size_t j{ 0 }; j < players[i]->INITIAL_HAND_SIZE; j++)
 		{
-			Card* c = &DrawCard();
-			dealer.DealCard(*c, players[i]);
-			if (i == 0)
-			{
-				GameRender::DrawElement(c, dealerHand);
-			}
-			else
-			{
-				GameRender::DrawElement(c, playerHand);
-			}
+			Card* c = DrawCard();
+			dealer.DealCard(c, players[i]);
+			GameRender::DrawElement(c, (i == 0 ? DEALER_HAND : PLAYER_HAND) + (CARD_PADDING * j));
 		}
 	}
 }
@@ -752,10 +751,5 @@ void Match::PayBet(int playerResult, int hand)
 int Match::DecideAValue(int baseScore)
 {
 	return (baseScore + 11 > 21 ? 1 : 11);
-}
-
-void Match::SetBet(int delta, int betPosition)
-{
-	bets[betPosition] += delta;
 }
 

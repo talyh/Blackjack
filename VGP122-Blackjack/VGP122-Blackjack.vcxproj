@@ -129,6 +129,7 @@
     <ClInclude Include="Match.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="GameRender.h" />
+    <ClInclude Include="Size.h" />
     <ClInclude Include="Sprite.h" />
   </ItemGroup>
   <ItemGroup>

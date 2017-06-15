@@ -6,7 +6,7 @@ Player::Player() : hands(Player::INITIAL_HANDS), handsActive(Player::INITIAL_HAN
 	handsScore[0] = 0;
 }
 
-void Player::ReceiveCard(Card card, int hand)
+void Player::ReceiveCard(Card* card, int hand)
 {
 	// if there's not yet a hand "row" to store cards, create a new row and mark that hand active
 	if (hands.size() <= hand)
@@ -17,7 +17,7 @@ void Player::ReceiveCard(Card card, int hand)
 		Player::handsScore.push_back(0);
 	}
 	// place new card at the end of the selected row
-	hands[hand].push_back(card);
+	hands[hand].push_back(*card);
 }
 
 void Player::Stay(int hand)

@@ -9,7 +9,7 @@ class Player
 public:
 	Player();
 
-	virtual void ReceiveCard(Card card, int hand = 0); // puts a card in the player's hand
+	virtual void ReceiveCard(Card* card, int hand = 0); // puts a card in the player's hand
 	
 	void Stay(int hand = 0);
 

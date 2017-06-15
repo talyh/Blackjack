@@ -8,7 +8,7 @@ class Dealer : public Player
 public:
 	Dealer();
 
-	void DealCard(Card card, Player* currentPlayer, int hand = 0); // to distribute cards to players
+	void DealCard(Card* card, Player* currentPlayer, int hand = 0); // to distribute cards to players
 
 	virtual void ReceiveCard(Card card, int hand = 0); // to add card to hand
 
