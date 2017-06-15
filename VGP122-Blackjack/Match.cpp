@@ -1,5 +1,84 @@
 #include "Match.h"
 
+// initialize timer variables
+int				deltaT = 75;	// defines delay in time for updating game loop
+int				updatedTime = 0;	// used to determine if frame rate interval has elapsed
+
+// initialize Event Variables
+SDL_Event matchEvent;
+
+// define overal layout elements
+// avatar
+Sprite *avatar = NULL;
+const Size AVATAR_SIZE{ 72, 72 };
+const string AVATAR_IMAGE = "imgs/avatar.png";
+const Position AVATAR_POSITION { 
+	PADDING , 
+	SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING 
+};
+// credits
+Textbox lblPlayerCredits {
+	"lblPlayerCredits",
+	AVATAR_POSITION.xPos + AVATAR_SIZE.width + PADDING, 
+	AVATAR_POSITION.yPos, 
+	0, 
+	0, 
+	"Credits: " 
+};
+Textbox txtCredits { "txtCredits" };
+
+// bets
+const int LBL_BET_INITIAL_WIDTH = 50;
+Textbox lblBet1 {
+	"lblBet1",
+	SCREEN_WIDTH / 6 - LBL_BET_INITIAL_WIDTH,
+	SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING * 5,
+	0,
+	0,
+	"Bet: "
+};
+Textbox txtBet1 {};
+Textbox lblBet2 {
+	"lblBet2",
+	SCREEN_WIDTH / 6 - LBL_BET_INITIAL_WIDTH,
+	SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING * 5,
+	0,
+	0,
+	"Bet: "
+};
+Textbox txtBet2 {};
+const Size BTN_BET_SIZE{ 32, 32 };
+Button btnBetUp1 {
+	"btnBetUp1",
+	SCREEN_WIDTH / 6 + 50,
+	lblBet1.position.yPos - BTN_BET_SIZE.height / 2 - 8,
+	BTN_BET_SIZE.width,
+	BTN_BET_SIZE.height,
+	BTN_BET_UP_IMAGE,
+	NULL
+};
+Button btnBetDown1 {
+	"btnBetDown1",
+	SCREEN_WIDTH / 6 + 50,
+	lblBet1.position.yPos + BTN_BET_SIZE.height / 2 + 8,
+	BTN_BET_SIZE.width,
+	BTN_BET_SIZE.height,
+	BTN_BET_DOWN_IMAGE,
+	NULL
+};
+Button btnBetConfirm1{
+	"btnConfirm1",
+	btnBetUp1.position.xPos + BTN_BET_SIZE.width + 8,
+	lblBet1.position.yPos + BTN_BET_SIZE.height / 2,
+	BTN_BET_SIZE.width,
+	BTN_BET_SIZE.height,
+	BTN_BET_CONFIRM_IMAGE,
+	NULL
+};
+Position dealerHand { SCREEN_WIDTH / 2 - CARD_WIDTH - PADDING, PADDING };
+Position playerHand { SCREEN_WIDTH / 2 - CARD_WIDTH - PADDING, SCREEN_HEIGHT - CARD_HEIGHT - PADDING * 4 };
+
+
 Match::Match() : gameStatus{ notStarted } 
 { 
 	// assign players to the players vector pointer
@@ -20,19 +99,15 @@ int Match::GetGameStatus()
 
 void Match::PlayGame()
 {
-	system("cls");
 	gameStatus = running;
+	GameRender::ClearScreen();
 
 	// shuflle deck
 	deck->Shuffle(SHUFFLES);
 
-	cout << "----------------------------------------------" << endl;
-	cout << "                   Welcome !                  " << endl;
-	cout << "----------------------------------------------" << endl;
-	
 	// game runs while player has creddits
 	// if cards run out, a new deck is used
-	while (player.GetCredits() > 0)
+	while (player.GetCredits() > initialBet)
 	{
 		PlayRound();
 	}
@@ -44,63 +119,100 @@ void Match::PlayRound()
 	beginningRound = true;
 	finishedRound = false;
 
-	cout << "----------------- New Round ------------------" << endl;
-	cout << "You currently have $" << player.GetCredits() << endl;
-	GetBet();
-	cout << "You have $" << roundCredits << " left" << endl;
-	cout << "----------------------------------------------" << endl;
-	
-	DealInitialHands();
-	
-	for (Player* p : players)
+	while (!finishedRound)
 	{
-		CalculatePlayerScore(p);
+		GameRender::ClearScreen(true);
+		// show avatar
+		GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
+
+		// show credits
+		GameRender::PrintText(&lblPlayerCredits, true);
+		txtCredits.value = to_string(player.GetCredits());
+		txtCredits.position.xPos = lblPlayerCredits.position.xPos + lblPlayerCredits.size.width + PADDING;
+		txtCredits.position.yPos = lblPlayerCredits.position.yPos,
+		GameRender::PrintText(&txtCredits);
+
+		// get bet
+		bool betting = true;
+		GetBet(&betting);
+
+		// deal cards
+		GameRender::ClearScreen();
+		DealInitialHands();
+		ListenForGameEvents(betting);
+
+		// check for immediate blackjacks
+		//for (Player* p : players)
+			//{
+			//	CalculatePlayerScore(p);
+			//}
+
+			///* -----------------------------------------------------------------------------------------*/
+			//// ------------------------------------- REVIEW --------------------------------------------
+			//// if the two first cards in the player's main hand have the same face, they can be split
+			////splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
+			///* -----------------------------------------------------------------------------------------*/
+
+		// show cards
+
+		// get play
+		bool gettingPlay = true;
+		//GetPlay();
+
+		// finish round
 	}
-
-	// if the two first cards in the player's main hand have the same face, they can be split
-	//splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
-
-	// show cards
-	cout << "House: " << endl;
-	ViewPlayerGame(&dealer, false);
-	cout << "You: " << endl;
-	ViewPlayerGame(&player);
 	
-	// if dealer has a risky hand
-	if (dealer.GetHandRisk())
-	{
-		OfferSurrender();
-	}	
-	// if any of the players got a natural blackjack, jump to Finish Round
-	if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
-	{
-		FinishRound();
-	}	
-	// if not, play as usual
-	else
-	{
-		// player's turn
-		cout << "---------------- Your Turn ------------------" << endl;
-		
-		if (!finishedRound)
-		{
-			bool all21{ true };
-			bool allBusted{ true };
-			LetPlayerPlay(&all21, &allBusted);
+	//for (Player* p : players)
+	//{
+	//	CalculatePlayerScore(p);
+	//}
+	///* -----------------------------------------------------------------------------------------*/
+	//// ------------------------------------- REVIEW --------------------------------------------
+	//// if the two first cards in the player's main hand have the same face, they can be split
+	////splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
+	///* -----------------------------------------------------------------------------------------*/
+
+	//// show cards
+	//cout << "House: " << endl;
+	//ViewPlayerGame(&dealer, false);
+	//cout << "You: " << endl;
+	//ViewPlayerGame(&player);
+	//
+	//// if dealer has a risky hand
+	//if (dealer.GetHandRisk())
+	//{
+	//	OfferSurrender();
+	//}	
+	//// if any of the players got a natural blackjack, jump to Finish Round
+	//if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
+	//{
+	//	FinishRound();
+	//}	
+	//// if not, play as usual
+	//else
+	//{
+	//	// player's turn
+	//	cout << "---------------- Your Turn ------------------" << endl;
+	//	
+	//	if (!finishedRound)
+	//	{
+	//		bool all21{ true };
+	//		bool allBusted{ true };
+	//		LetPlayerPlay(&all21, &allBusted);
 
 
-			if (!all21 && !allBusted)
-			{
-				// house's turn
-				cout << "-------------- House Turn ------------------" << endl;
-				LetHousePlay();
-			}
+	//		if (!all21 && !allBusted)
+	//		{
+	//			// house's turn
+	//			cout << "-------------- House Turn ------------------" << endl;
+	//			LetHousePlay();
+	//		}
 
-			// finish round
-			FinishRound();
-		}
-	}
-	cout << "----------------------------------------------" << endl;	
+	//		// finish round
+	//		FinishRound();
+	//	}
+	//}
+	//cout << "----------------------------------------------" << endl;	
 }
 
 Card Match::DrawCard() {
@@ -120,34 +232,108 @@ void Match::DealInitialHands()
 	{
 		for (size_t j{ 0 }; j < players[i]->INITIAL_HAND_SIZE; j++)
 		{
-			dealer.DealCard(DrawCard(), players[i]);
+			Card* c = &DrawCard();
+			dealer.DealCard(*c, players[i]);
+			if (i == 0)
+			{
+				GameRender::DrawElement(c, dealerHand);
+			}
+			else
+			{
+				GameRender::DrawElement(c, playerHand);
+			}
 		}
 	}
 }
 
-void Match::GetBet()
+void Match::GetBet(bool listening)
 {
-	cout << "Enter the amount you'd like to bet: $";
-	cin >> bets[0];
+	bets[0] = initialBet;
+	roundCredits = player.GetCredits() - bets[0];
+	txtCredits.value = to_string(roundCredits);
+	txtBet1.value = to_string(bets[0]);
+	
+	GameRender::ClearScreen(true);
+	GameRender::PrintText(&lblBet1, true);
+	GameRender::DrawElement(&btnBetUp1);
+	GameRender::DrawElement(&btnBetDown1);
+	GameRender::DrawElement(&btnBetConfirm1);
 
-	if (bets[0] > 0)
-	{	
-		if (player.ValidateBet(bets[0]))
-		{
-			roundCredits = player.GetCredits() - bets[0];
-			cout << "Betting $" << bets[0] << endl;
-		}
-		else
-		{
-			cout << "Insuficient credits." << endl;
-			GetBet();
-		}
-	}
-	else
+	while (listening)
 	{
-		cout << "Invalid bet." << endl;
-		Common::FlushInput();
-		GetBet();
+		if (SDL_GetTicks() - updatedTime >= deltaT)
+		{
+			txtBet1.position = { lblBet1.position.xPos + lblBet1.size.width + PADDING , lblBet1.position.yPos }; 
+			GameRender::PrintText(&txtCredits);
+			GameRender::PrintText(&txtBet1);
+			
+			while (SDL_PollEvent(&matchEvent))
+			{
+				switch (matchEvent.type)
+				{
+					// Check if user tries to quit the window
+					case SDL_QUIT:
+					{
+						// Break out of loop to end game
+						listening = false;
+						exit(1);
+						break;
+					}
+					//	Check if the ESC key was pressed
+					case SDL_KEYDOWN:
+					{
+						//	Check if 'ESC' was pressed
+						if (matchEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+						{
+							// Break out of loop to end game
+							listening = false;
+							exit(1);
+						}
+						break;
+					}
+					case SDL_MOUSEBUTTONDOWN:
+					{
+						GameRender::PlaySound(SFX_BUTTON_CLICK);
+
+						if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetUp1.image))
+						{
+							if (player.ValidateBet(bets[0] + betIncrement))
+							{
+								bets[0] += betIncrement;
+								roundCredits = player.GetCredits() - bets[0];
+							}
+							else
+							{	
+								// print error message
+							}
+						}
+						else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetDown1.image))
+						{
+							if (bets[0] - betIncrement >= initialBet)
+							{
+								bets[0] -= betIncrement;
+								roundCredits = player.GetCredits() - bets[0];
+							}
+							else
+							{
+								// print error message
+							}
+						}
+						else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetConfirm1.image))
+						{
+							listening = false;
+						}
+
+						GameRender::ClearScreen(true);
+						txtCredits.value = to_string(roundCredits);
+						txtBet1.value = to_string(bets[0]);
+						break;
+					}
+				}
+			}
+			// update time
+			updatedTime = SDL_GetTicks();
+		}
 	}
 }
 
@@ -401,6 +587,13 @@ void Match::FinishRound(bool surrender)
 	dealerPlayed = false;
 	finishedRound = true;
 	insuranceApplied = false;
+
+	// clean items created
+	for (void* item : itemsCreated)
+	{
+		delete item;
+		item = nullptr;
+	}
 }
 
 void Match::FinishGame()
@@ -559,5 +752,10 @@ void Match::PayBet(int playerResult, int hand)
 int Match::DecideAValue(int baseScore)
 {
 	return (baseScore + 11 > 21 ? 1 : 11);
+}
+
+void Match::SetBet(int delta, int betPosition)
+{
+	bets[betPosition] += delta;
 }
 

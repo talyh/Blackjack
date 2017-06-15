@@ -1,17 +1,22 @@
 #include "GameRender.h"
 
 static vector<void*> itemsCreated; // to store items dynamically created so we can delete them afterwards
+static vector<GameRender::Component> savedComponents;
 
-SDL_Window* window = nullptr; // the window for the project
-SDL_Renderer* renderer = nullptr; // the renderer to use in that window
-Sprite* background = nullptr;
-
-TTF_Font *font = NULL; // the font we'll use throughout the game
-
-Mix_Music *music = NULL; // the music listener to be used throughout the game
+SDL_Window* GameRender::window;
+SDL_Renderer* GameRender::renderer;
+Sprite* GameRender::background;
+TTF_Font* GameRender::font;
+Mix_Music* GameRender::music;
 
 int GameRender::Initialize(string gameFont, int fontSize)
 {
+	GameRender::window = NULL;
+	renderer = NULL;
+	background = NULL;
+	font = NULL;
+	music = NULL;
+	
 	/** Initialize SDL */
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
 	{
@@ -112,7 +117,7 @@ void GameRender::DrawBackground()
 	SDL_RenderPresent(renderer);
 }
 
-void GameRender::DrawElement(string filename, int xPos, int yPos, int width, int height, Sprite** elementPtr)
+void GameRender::DrawElement(string filename, int xPos, int yPos, int width, int height, Sprite** elementPtr, string saveName)
 {
 	// create a new sprite, with the info provided
 	Sprite* image = NULL;
@@ -127,15 +132,22 @@ void GameRender::DrawElement(string filename, int xPos, int yPos, int width, int
 
 	// redraw the renderer
 	SDL_RenderPresent(renderer);
+
+	SaveComponent((saveName != "" ? saveName : filename), image->getImage(), { image->getXPos(), image->getYPos() });
 }
 
-void GameRender::DrawElement(Sprite* image, int xPos, int yPos, int width, int height)
+void GameRender::DrawElement(Sprite* image, Position position)
 {
 	if (image)
 	{
+		if (!image->GetLoaded())
+		{
+			image->load(image->GetFilename().c_str() , renderer);
+		}
+
 		// reposition and ensure image is visible
-		image->setXPos(xPos);
-		image->setYPos(yPos);
+		image->setXPos(position.xPos);
+		image->setYPos(position.yPos);
 		image->setVisible(true);
 
 		// send the sprite to the renderer
@@ -150,38 +162,100 @@ void GameRender::DrawElement(Sprite* image, int xPos, int yPos, int width, int h
 	}
 }
 
-void GameRender::PrintText(string text, int xPos, int yPos, int size, SDL_Color color)
+void GameRender::DrawElement(Component* c)
 {
-	cout << "Printing text " << text << endl;
-		
-	// set the text properties
-	SDL_Color textColor = color;
-	SDL_Rect dest = { xPos, yPos }; // set textbox position, but allow for size to be defined later on
-	SDL_Surface *textbox = NULL; // the text image to be drawn to represent the text
-	SDL_Texture *scoreTexture = NULL; // the texture to apply
+	cout << "Drawing component " << c->name << endl;
+	
+	if (c->texture)
+	{
+		SDL_Texture* t = c->texture;
+		SDL_Rect dest { c->position.xPos, c->position.yPos };
+		SDL_QueryTexture(c->texture, nullptr, nullptr, &dest.w, &dest.h);
+		SDL_RenderCopy(renderer, c->texture, nullptr, &dest);
+	}
+	else
+	{
+		cout << "Cannot get image to draw" << endl;
+	}
+}
 
+void GameRender::DrawElement(Button* button)
+{
+	DrawElement(button->src, button->position.xPos, button->position.yPos, button->size.width, button->size.height, &(button->image), button->name);
+}
+
+void GameRender::DrawElement(Card* card, Position position)
+{
+	DrawElement(card->GetImage(), position);
+}
+
+
+//void GameRender::PrintText(Textbox* textbox, SDL_Surface** surface, SDL_Texture** texture)
+//{
+//	cout << "Printing text " << textbox->value << endl;
+//	
+//	// set the text properties
+//	//SDL_Color textColor = color;
+//	SDL_Rect dest = { textbox->position.xPos, textbox->position.yPos }; // set textbox position, but allow for size to be defined later on
+//	
+//	// set the style for the font
+//	TTF_SetFontStyle(font, TTF_STYLE_BOLD | TTF_STYLE_ITALIC);
+//	
+//	// set message for text
+//	*surface = TTF_RenderText_Blended_Wrapped(font, textbox->value.c_str(), {0,0,0}, SCREEN_WIDTH - textbox->position.xPos);
+//	
+//	// convert the text to image
+//	*texture = SDL_CreateTextureFromSurface(renderer, *surface);
+//	
+//	// set the size of the text
+//	dest.w = (*surface)->w;
+//	dest.h = (*surface)->h;
+//
+//	textbox->size.width = dest.w;
+//	textbox->size.height = dest.h;
+//	
+//	// render the image
+//	SDL_RenderCopy(renderer, *texture, nullptr, &dest);
+//	
+//	// update the screen
+//	SDL_RenderPresent(renderer);
+//}
+
+void GameRender::PrintText(Textbox* textbox, bool save)
+{
+	cout << "Printing text " << textbox->name << endl;
+
+	// set the text properties
+	SDL_Rect dest = { textbox->position.xPos, textbox->position.yPos }; // set textbox position, but allow for size to be defined later on
+	SDL_Surface* surface = NULL; // the text image to be drawn to represent the text
+	SDL_Texture* texture = NULL; // the texture to apply
+		
 	// set the style for the font
 	TTF_SetFontStyle(font, TTF_STYLE_BOLD | TTF_STYLE_ITALIC);
 
 	// set message for text
-	textbox = TTF_RenderText_Blended_Wrapped(font, text.c_str(), textColor, SCREEN_WIDTH - xPos);
+	surface = TTF_RenderText_Blended_Wrapped(font, textbox->value.c_str(), { 0,0,0 }, SCREEN_WIDTH - textbox->position.xPos);
 
 	// convert the text to image
-	scoreTexture = SDL_CreateTextureFromSurface(renderer, textbox);
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
 
 	// set the size of the text
-	dest.w = textbox->w;
-	dest.h = textbox->h;
+	dest.w = surface->w;
+	dest.h = surface->h;
+
+	textbox->size.width = dest.w;
+	textbox->size.height = dest.h;
 
 	// render the image
-	SDL_RenderCopy(renderer, scoreTexture, nullptr, &dest);
+	SDL_RenderCopy(renderer, texture, nullptr, &dest);
 
 	// update the screen
 	SDL_RenderPresent(renderer);
 
-	// free text resources
-	SDL_FreeSurface(textbox);
-	SDL_DestroyTexture(scoreTexture);
+	if (save)
+	{
+		SaveComponent(textbox->name, texture, {dest.x , dest.y} );
+	}
 }
 
 void GameRender::PlaySound(string sfxPath, int loops)
@@ -209,10 +283,29 @@ void GameRender::PlaySound(string sfxPath, int loops)
 	}	
 }
 
-void GameRender::ClearScreen()
+void GameRender::ClearScreen(bool keepSavedItems)
 {
 	SDL_RenderClear(renderer);
 	DrawBackground();
+
+	if (keepSavedItems)
+	{
+		for (Component c : savedComponents)
+		{
+			DrawElement(&c);
+		}
+		SDL_RenderPresent(renderer);
+	}
+	else
+	{
+		savedComponents.clear();
+	}
+}
+
+void GameRender::SaveComponent(string name, SDL_Texture * texture, Position position)
+{
+		Component c{ name, texture, position.xPos, position.yPos };
+		savedComponents.push_back(c);
 }
 
 void GameRender::Finish()

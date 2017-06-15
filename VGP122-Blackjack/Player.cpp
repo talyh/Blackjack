@@ -79,6 +79,13 @@ void Player::ViewSingleHand(int hand, bool showHandNumber)
 
 void Player::FinishRound()
 {
+	for (vector<Card> hand : hands)
+	{
+		for (Card card : hand)
+		{
+			card.DeleteImage();
+		}
+	}
 	hands = *(new vector<vector<Card>>(1));
 	handsActive = *(new vector<bool>(1));
 	handsActive[0] = true;

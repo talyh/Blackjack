@@ -1,23 +1,31 @@
 #include "Sprite.h"
 
+Sprite::Sprite()
+{
+}
+
 Sprite::Sprite(const char* filename, int xpos, int ypos, int width, int height, SDL_Renderer *renderer)
 {
 	/** Set SDL_Rect variable in Sprite class */
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = width;
-	rect.h = height;
+	source.x = 0;
+	source.y = 0;
+	source.w = width;
+	source.h = height;
 	
 	/** Set position variable of Sprite class */
 	this-> xpos = xpos;
 	this-> ypos = ypos;
 	
+	this->filename = filename;
 
 	/** Set visibility of Sprite class */
 	visible = true;
 
+	if (renderer)
 	/** Load image to use for Sprite */
-	load(filename, renderer);
+	{
+		load(this->filename.c_str(), renderer);
+	}
 
 	name = filename;
 
@@ -42,6 +50,10 @@ void Sprite::load(const char* filename, SDL_Renderer *renderer)
 		cerr << "IMG_LoadTexture Error: " << IMG_GetError() << endl;
 		exit(1);
 	}
+	else
+	{
+		loaded = true;
+	}
 }
 
 void Sprite::draw( SDL_Renderer *renderer)
@@ -50,10 +62,10 @@ void Sprite::draw( SDL_Renderer *renderer)
 	if(this->visible)
 	{
 		/** Position sprite on Screen */
-		SDL_Rect dest = {xpos, ypos, rect.w, rect.h};
+		SDL_Rect dest = {xpos, ypos, source.w, source.h};
 		
 		/** Draw Sprite to Screen */
-		SDL_RenderCopy(renderer, image, &rect, &dest);
+		SDL_RenderCopy(renderer, image, &source, &dest);
 
 		cout << "Image " << name << " drawn" << endl;
 	}
@@ -103,53 +115,53 @@ void Sprite::move(int deltaX, int deltaY)
 void Sprite::setCurrentFrame(Uint16 frame)
 {
 	/** Check if SDL_Rect was properly initialized */
-	if (!rect.w)
+	if (!source.w)
 	{
 		/** Not properly initialized so end function */
 		return;
 	}
 
 	/** Calculate current frame of animation */
-	rect.x = frame * rect.w;
+	source.x = frame * source.w;
 }
 
 void Sprite::setRow(Uint16 row)
 {
 	/** Check if SDL_Rect was properly initialized */
-	if (!rect.w)
+	if (!source.w)
 	{
 		/** Not properly initialized so end function */
 		return;
 	}
 
 	/** Calculate current frame of animation */
-	rect.y = rect.h * row;
+	source.y = source.h * row;
 }
 
 Uint16 Sprite::getRow()
 {
 	/** Check if SDL_Rect was properly initialized */
-	if (!rect.w)
+	if (!source.w)
 	{
 		/** Not properly initialized so end function */
 		return 0;
 	}
 
 	/** Calculate current frame of animation */
-	return rect.y / rect.h;
+	return source.y / source.h;
 }
 
 Uint16 Sprite::getCurrentFrame()
 {
 	/** Check if SDL_Rect was properly initialized */
-	if (!rect.w)
+	if (!source.w)
 	{
 		/** Not properly initialized so end function */
 		return 0;
 	}
 
 	/** Calculate current frame of animation */
-	return rect.x / rect.w;
+	return source.x / source.w;
 }
 
 /** Create Getters and Setters for private variables */
@@ -160,12 +172,12 @@ SDL_Texture *Sprite::getImage()
 
 int Sprite::getWidth()
 {
-	return this->rect.w;
+	return this->source.w;
 }
 
 int Sprite::getHeight()
 {
-	return this->rect.h;
+	return this->source.h;
 }
 
 int Sprite::getXPos()
@@ -183,14 +195,24 @@ bool Sprite::getVisibility()
 	return this->visible;
 }
 
+bool Sprite::GetLoaded()
+{
+	return loaded;
+}
+
+string Sprite::GetFilename()
+{
+	return filename;
+}
+
 void Sprite::setWidth(int width)
 {
-	this->rect.w = width;
+	this->source.w = width;
 }
 
 void Sprite::setHeight(int height)
 {
-	this->rect.h = height;
+	this->source.h = height;
 }
 
 void Sprite::setXPos(int x)

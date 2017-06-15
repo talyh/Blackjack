@@ -2,10 +2,13 @@
 #define  MATCH_H
 
 #include "Common.h"
+#include "CollisionDetection.h"
+#include "GameRender.h"
 #include "Deck.h"
 #include "Player.h"
 #include "Dealer.h"
 #include "Human.h"
+
 
 class Match
 {
@@ -22,7 +25,7 @@ public:
 
 	void DealInitialHands();
 
-	void GetBet();
+	void GetBet(bool listening);
 
 	void OfferSurrender();
 
@@ -60,7 +63,13 @@ public:
 	const enum GAMESTATUS { notStarted, running, over };
 	
 	static const int numberOfPlayers{ 2 };
+
+	const int initialBet { 10 };
+	const int betIncrement { 10 };
+
 private:
+	void SetBet(int delta, int betPosition = 0);
+	
 	const size_t SHUFFLES{ 100 }; // to determine how many times a deck should be shuffled on start
 	GAMESTATUS gameStatus; // to keep track of the game status and flow
 	Deck* deck; // to represent the deck of cards in use, can be replaced if the deck finishes
@@ -78,6 +87,8 @@ private:
 	bool finishedRound; // to determine whether the round is stll ongoing
 	bool insuranceApplied; // to indicate whether the player has insurance for that round
 	int insuranceValue; // to store the value of the insurance
+	
+	vector <void*> itemsCreated;
 };
 
 #endif
