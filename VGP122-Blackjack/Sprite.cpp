@@ -38,7 +38,7 @@ Sprite::~Sprite()
 	SDL_DestroyTexture(image);
 }
 
-void Sprite::load(const char* filename, SDL_Renderer *renderer) 
+void Sprite::load(const char* filename, SDL_Renderer* renderer) 
 {
 	/** Load picture for Sprite */
 	image = IMG_LoadTexture(renderer, filename);

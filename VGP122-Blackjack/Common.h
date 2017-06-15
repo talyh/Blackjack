@@ -13,6 +13,9 @@
 #include <sdl_ttf.h>
 #include <sdl_mixer.h>
 #include "Size.h"
+#include "Position.h"
+#include "Textbox.h"
+#include "Button.h"
 
 using namespace std;
 
@@ -21,89 +24,13 @@ using namespace std;
 #define CARD_WIDTH CARD_H::SIZE.width
 #define CARD_HEIGHT CARD_H::SIZE.height
 
-struct Position
-{
-	int xPos { 0 };
-	int yPos { 0 };
-
-	Position& Position::operator+= (const int rhs)
-	{
-		xPos += rhs;
-		yPos += rhs;
-		return *this;
-	}
-	friend Position operator+(const Position & lhs, const int & rhs)
-	{
-		Position z = lhs;
-		z += rhs;
-		return z;
-	}
-
-	Position& Position::operator-= (const int rhs)
-	{
-		xPos -= rhs;
-		yPos -= rhs;
-		return *this;
-	}
-	friend Position operator-(const Position & lhs, const int & rhs)
-	{
-		Position z = lhs;
-		z -= rhs;
-		return z;
-	}
-
-	Position& Position::operator*= (const int rhs)
-	{
-		xPos *= rhs;
-		yPos *= rhs;
-		return *this;
-	}
-	friend Position operator*(const Position & lhs, const int & rhs)
-	{
-		Position z = lhs;
-		z *= rhs;
-		return z;
-	}
-
-	Position& Position::operator/= (const int rhs)
-	{
-		xPos /= rhs;
-		yPos /= rhs;
-		return *this;
-	}
-	friend Position operator/(const Position & lhs, const int & rhs)
-	{
-		Position z = lhs;
-		z /= rhs;
-		return z;
-	}
-};
-
-struct Textbox 
-{
-	string name { "" };
-	Position position { 0, 0 }; 
-	Size size { 0, 0 };
-	string value { "" };
-};
-
-class Sprite;
-
-struct Button
-{
-	string name { "" };
-	Position position { 0, 0 };
-	Size size { 0, 0 };
-	string src { "" };
-	Sprite* image{ nullptr };
-	string sfxSrc { "" };
-};
-
 // define layout variables
 const int LINE_HEIGHT{ 20 };
-const int PADDING{ 20 };
-const Size START_MENU_BUTTON_SIZE{ 383, 78 };
-
+const int PADDING  { 20 };
+const Size START_MENU_BUTTON_SIZE { 383, 78 };
+const Size BET_BUTTON_SIZE { 32, 32 }; 
+const Size PLAY_BUTTON_SIZE { 32, 32 };
+const int BUTTON_PADDING { 8 };
 
 // protoype functions
 void ListenForGameEvents(bool listening);
@@ -119,7 +46,20 @@ const string BTN_QUIT_IMAGE = "imgs/btnQuit.png";
 const string BTN_BET_UP_IMAGE = "imgs/btnBetUp.png";
 const string BTN_BET_DOWN_IMAGE = "imgs/btnBetDown.png";
 const string BTN_BET_CONFIRM_IMAGE = "imgs/btnBetConfirm.png";
+const string BTN_HIT_IMAGE = "imgs/btnHit.png";
+const string BTN_HIT_TOOLTIP = "imgs/btnHitTooltip.png";
+const string BTN_STAY_IMAGE = "imgs/btnStay.png";
+const string BTN_STAY_TOOLTIP = "imgs/btnStayTooltip.png";
+const string BTN_SPLIT_IMAGE = "imgs/btnSplit.png";
+const string BTN_SPLIT_TOOLTIP = "imgs/btnSplitTooltip.png";
+const string BTN_DOUBLE_DOWN_IMAGE = "imgs/btnDoubleDown.png";
+const string BTN_DOUBLE_DOWN_TOOLTIP = "imgs/btnDoubleDownTooltip.png";
+const string BTN_SURRENDER_IMAGE = "imgs/btnSurrender.png";
+const string BTN_SURRENDER_TOOLTIP = "imgs/btnSurrenderTooltip.png";
+const string BTN_YES_IMAGE = "imgs/btnConfirm.png";
+const string BTN_NO_IMAGE = "imgs/btnPass.png";
 const string CARDS_IMAGE = "imgs/cards.png";
+const string CARD_BACK_IMAGE = "imgs/cardBack.png";
 // audio
 const string MUSIC = "snds/music.mid";
 const string SFX_BUTTON_CLICK = "snds/jump.wav";

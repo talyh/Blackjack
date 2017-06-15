@@ -182,44 +182,29 @@ void GameRender::DrawElement(Component* c)
 void GameRender::DrawElement(Button* button)
 {
 	DrawElement(button->src, button->position.xPos, button->position.yPos, button->size.width, button->size.height, &(button->image), button->name);
+	if (button->tooltip)
+	{
+		button->tooltip->setVisible(false);
+		DrawElement(button->tooltipSrc, button->position.xPos + button->size.width + BUTTON_PADDING, button->position.yPos + button->size.height / 2, button->tooltipSize.width, button->tooltipSize.height, &(button->tooltip), button->name + "Tooltip");
+	}
+	itemsCreated.push_back(button->image);
+	itemsCreated.push_back(button->tooltip);
 }
 
 void GameRender::DrawElement(Card* card, Position position)
 {
-	DrawElement(card->GetImage(), position);
+	if (card->GetFaceUp())
+	{
+		DrawElement(card->GetImage(), position);
+	}
+	else
+	{
+		Sprite* cardBack = new Sprite(CARD_BACK_IMAGE.c_str(), position.xPos, position.yPos, CARD_WIDTH, CARD_HEIGHT, renderer);
+		DrawElement(cardBack, position);
+		delete cardBack;
+		cardBack = nullptr;
+	}
 }
-
-
-//void GameRender::PrintText(Textbox* textbox, SDL_Surface** surface, SDL_Texture** texture)
-//{
-//	cout << "Printing text " << textbox->value << endl;
-//	
-//	// set the text properties
-//	//SDL_Color textColor = color;
-//	SDL_Rect dest = { textbox->position.xPos, textbox->position.yPos }; // set textbox position, but allow for size to be defined later on
-//	
-//	// set the style for the font
-//	TTF_SetFontStyle(font, TTF_STYLE_BOLD | TTF_STYLE_ITALIC);
-//	
-//	// set message for text
-//	*surface = TTF_RenderText_Blended_Wrapped(font, textbox->value.c_str(), {0,0,0}, SCREEN_WIDTH - textbox->position.xPos);
-//	
-//	// convert the text to image
-//	*texture = SDL_CreateTextureFromSurface(renderer, *surface);
-//	
-//	// set the size of the text
-//	dest.w = (*surface)->w;
-//	dest.h = (*surface)->h;
-//
-//	textbox->size.width = dest.w;
-//	textbox->size.height = dest.h;
-//	
-//	// render the image
-//	SDL_RenderCopy(renderer, *texture, nullptr, &dest);
-//	
-//	// update the screen
-//	SDL_RenderPresent(renderer);
-//}
 
 void GameRender::PrintText(Textbox* textbox, bool save)
 {
@@ -304,7 +289,7 @@ void GameRender::ClearScreen(bool keepSavedItems)
 
 void GameRender::SaveComponent(string name, SDL_Texture * texture, Position position)
 {
-		Component c{ name, texture, position.xPos, position.yPos };
+		Component c { name, texture, position.xPos, position.yPos };
 		savedComponents.push_back(c);
 }
 

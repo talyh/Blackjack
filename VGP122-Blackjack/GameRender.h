@@ -34,8 +34,6 @@ public:
 
 	static void DrawElement(Card* card, Position position);
 
-	//static void PrintText(Textbox* textbox, SDL_Surface** surface, SDL_Texture** texture);
-
 	static void PrintText(Textbox* textbox, bool save = false);
 
 	static void PlaySound(string sfxPath, int loops = 0);

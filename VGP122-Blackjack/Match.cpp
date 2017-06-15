@@ -18,8 +18,8 @@ const Position AVATAR_POSITION {
 };
 
 // credits
-Textbox lblPlayerCredits {
-	"lblPlayerCredits",
+Textbox lblCredits {
+	"lblCredits",
 	AVATAR_POSITION.xPos + AVATAR_SIZE.width + PADDING, 
 	AVATAR_POSITION.yPos, 
 	0, 
@@ -48,41 +48,112 @@ Textbox lblBet2 {
 	"Bet: "
 };
 Textbox txtBet2 {};
-const Size BTN_BET_SIZE{ 32, 32 };
-Button btnBetUp1 {
+Button btnBetUp1{
 	"btnBetUp1",
-	SCREEN_WIDTH / 6 + 50,
-	lblBet1.position.yPos - BTN_BET_SIZE.height / 2 - 8,
-	BTN_BET_SIZE.width,
-	BTN_BET_SIZE.height,
+	{
+		SCREEN_WIDTH / 6 + 50,
+		lblBet1.position.yPos - BET_BUTTON_SIZE.height / 2 - 8
+	},
+	BET_BUTTON_SIZE,
 	BTN_BET_UP_IMAGE,
-	NULL
+	new Sprite(BTN_BET_UP_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
 };
 Button btnBetDown1 {
 	"btnBetDown1",
-	SCREEN_WIDTH / 6 + 50,
-	lblBet1.position.yPos + BTN_BET_SIZE.height / 2 + 8,
-	BTN_BET_SIZE.width,
-	BTN_BET_SIZE.height,
+	{
+		SCREEN_WIDTH / 6 + 50,
+		lblBet1.position.yPos + BET_BUTTON_SIZE.height / 2 + 8
+	},
+	BET_BUTTON_SIZE,
 	BTN_BET_DOWN_IMAGE,
-	NULL
+	new Sprite(BTN_BET_DOWN_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
 };
-Button btnBetConfirm1{
+Button btnBetConfirm1 {
 	"btnConfirm1",
-	btnBetUp1.position.xPos + BTN_BET_SIZE.width + 8,
-	lblBet1.position.yPos + BTN_BET_SIZE.height / 2,
-	BTN_BET_SIZE.width,
-	BTN_BET_SIZE.height,
+	{
+		btnBetUp1.position.xPos + BET_BUTTON_SIZE.width + 8,
+		lblBet1.position.yPos + BET_BUTTON_SIZE.height / 2
+	},
+	BET_BUTTON_SIZE,
 	BTN_BET_CONFIRM_IMAGE,
-	NULL
+	new Sprite(BTN_BET_CONFIRM_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
 };
+Button btnHit {
+	"btnHit",
+	{ 
+		PADDING,
+		SCREEN_HEIGHT / 2
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_HIT_IMAGE,
+	new Sprite(BTN_HIT_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	SFX_HIT,
+	{ 40, 23 },
+	BTN_HIT_TOOLTIP,
+	new Sprite(BTN_HIT_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnStay{
+	"btnStay",
+	{
+		btnHit.position.xPos,
+		btnHit.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_STAY_IMAGE,
+	new Sprite(BTN_STAY_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	SFX_STAY,
+	{ 50, 23 },
+	BTN_STAY_TOOLTIP,
+	new Sprite(BTN_STAY_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnDoubleDown {
+	"btnDoubleDown",
+	{
+		btnStay.position.xPos,
+		btnStay.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_DOUBLE_DOWN_IMAGE,
+	new Sprite(BTN_DOUBLE_DOWN_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	SFX_DOUBLE_DOWN,
+	{ 113, 23 },
+	BTN_DOUBLE_DOWN_TOOLTIP,
+	new Sprite(BTN_DOUBLE_DOWN_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnSplit {
+	"btnSplit",
+	{
+		btnDoubleDown.position.xPos,
+		btnDoubleDown.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_SPLIT_IMAGE,
+	new Sprite(BTN_SPLIT_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	SFX_DOUBLE_DOWN,
+	{ 50, 23 },
+	BTN_SPLIT_TOOLTIP,
+	new Sprite(BTN_SPLIT_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnSurrender {
+	"btnSurrender",
+	{
+		btnSplit.position.xPos,
+		btnSplit.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_SURRENDER_IMAGE,
+	new Sprite(BTN_SURRENDER_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	"",
+	{ 93, 23 },
+	BTN_SURRENDER_TOOLTIP,
+	new Sprite(BTN_SURRENDER_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+
 
 // hands
 const int CARD_PADDING { 15 };
 const Position DEALER_HAND { SCREEN_WIDTH / 2 - CARD_WIDTH , PADDING };
 const Position PLAYER_HAND { SCREEN_WIDTH / 2 - CARD_WIDTH, SCREEN_HEIGHT - CARD_HEIGHT - PADDING * 4 };
-
-
 
 Match::Match() : gameStatus{ notStarted } 
 { 
@@ -131,40 +202,53 @@ void Match::PlayRound()
 		GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
 
 		// show credits
-		GameRender::PrintText(&lblPlayerCredits, true);
+		GameRender::PrintText(&lblCredits, true);
 		txtCredits.value = to_string(player.GetCredits());
-		txtCredits.position.xPos = lblPlayerCredits.position.xPos + lblPlayerCredits.size.width + PADDING;
-		txtCredits.position.yPos = lblPlayerCredits.position.yPos,
+		txtCredits.position.xPos = lblCredits.position.xPos + lblCredits.size.width + PADDING;
+		txtCredits.position.yPos = lblCredits.position.yPos,
 		GameRender::PrintText(&txtCredits);
 
 		// get bet
 		bool betting = true;
 		GetBet(&betting);
 
-		// deal cards
+		// redraw screen
 		GameRender::ClearScreen();
-		DealInitialHands();
-		ListenForGameEvents(betting);
+		GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
+		GameRender::PrintText(&lblCredits, true);
+		GameRender::PrintText(&txtCredits);
 
+		// deal cards
+		DealInitialHands();
+		// TODO - hide first card
+
+		// TODO
 		// check for immediate blackjacks
 		//for (Player* p : players)
-			//{
-			//	CalculatePlayerScore(p);
-			//}
+		//{
+		//	CalculatePlayerScore(p);
+		//}
 
-			///* -----------------------------------------------------------------------------------------*/
-			//// ------------------------------------- REVIEW --------------------------------------------
-			//// if the two first cards in the player's main hand have the same face, they can be split
-			////splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
-			///* -----------------------------------------------------------------------------------------*/
-
-		// show cards
-
+		// show options
+		GameRender::DrawElement(&btnHit);
+		GameRender::DrawElement(&btnStay);
+		if (beginningRound)
+		{
+			GameRender::DrawElement(&btnDoubleDown);
+			if (player.GetSplitable())
+			{
+				GameRender::DrawElement(&btnSplit);
+			}
+			if (dealer.GetHandRisk())
+			{
+				GameRender::DrawElement(&btnSurrender);
+				// TODO - add call to insurance
+			}
+		}
+		
 		// get play
 		bool gettingPlay = true;
 		//GetPlay();
-
-		// finish round
 	}
 	
 	//for (Player* p : players)

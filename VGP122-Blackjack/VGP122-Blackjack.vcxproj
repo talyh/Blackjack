@@ -120,6 +120,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Card.h" />
     <ClInclude Include="CollisionDetection.h" />
     <ClInclude Include="Common.h" />
@@ -129,8 +130,10 @@
     <ClInclude Include="Match.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="GameRender.h" />
+    <ClInclude Include="Position.h" />
     <ClInclude Include="Size.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Textbox.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Card.cpp" />
