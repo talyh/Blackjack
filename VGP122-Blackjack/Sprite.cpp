@@ -205,6 +205,11 @@ string Sprite::GetFilename()
 	return filename;
 }
 
+SDL_Rect* const Sprite::GetSource()
+{
+	return &source;
+}
+
 void Sprite::setWidth(int width)
 {
 	this->source.w = width;

@@ -164,14 +164,23 @@ void GameRender::DrawElement(Sprite* image, Position position)
 
 void GameRender::DrawElement(Component* c)
 {
-	cout << "Drawing component " << c->name << endl;
+	//cout << "Drawing component " << c->name << endl;
 	
 	if (c->texture)
 	{
 		SDL_Texture* t = c->texture;
-		SDL_Rect dest { c->position.xPos, c->position.yPos };
-		SDL_QueryTexture(c->texture, nullptr, nullptr, &dest.w, &dest.h);
-		SDL_RenderCopy(renderer, c->texture, nullptr, &dest);
+		SDL_Rect dest{ c->position.xPos, c->position.yPos };
+		if (c->sourceArea)
+		{
+			dest.w = c->sourceArea->w;
+			dest.h = c->sourceArea->h;
+		}
+		else
+		{
+			SDL_QueryTexture(c->texture, nullptr, nullptr, &dest.w, &dest.h);
+		}
+		
+		SDL_RenderCopy(renderer, c->texture, c->sourceArea, &dest);
 	}
 	else
 	{
@@ -204,6 +213,7 @@ void GameRender::DrawElement(Card* card, Position position)
 		delete cardBack;
 		cardBack = nullptr;
 	}
+	SaveComponent(card->GetFace() + " of " + card->GetSuit(), card->GetImage()->getImage(), {card->GetImage()->getXPos(), card->GetImage()->getYPos()}, card->GetImage()->GetSource());
 }
 
 void GameRender::PrintText(Textbox* textbox, bool save)
@@ -287,10 +297,10 @@ void GameRender::ClearScreen(bool keepSavedItems)
 	}
 }
 
-void GameRender::SaveComponent(string name, SDL_Texture * texture, Position position)
+void GameRender::SaveComponent(const string name, SDL_Texture* const texture, const Position position, SDL_Rect* const sourceArea)
 {
-		Component c { name, texture, position.xPos, position.yPos };
-		savedComponents.push_back(c);
+	Component c { name, texture, position, sourceArea };
+	savedComponents.push_back(c);
 }
 
 void GameRender::Finish()

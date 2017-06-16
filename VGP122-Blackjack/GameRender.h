@@ -14,6 +14,7 @@ public:
 		string name { "" };
 		SDL_Texture* texture { nullptr };
 		Position position { 0, 0 };
+		SDL_Rect* sourceArea { nullptr };
 	};
 	
 	static int Initialize(string gameFont, int fontSize);
@@ -40,7 +41,7 @@ public:
 
 	static void ClearScreen(bool keepSavedItems = false);
 
-	static void SaveComponent(string name, SDL_Texture* texture, Position position);
+	static void SaveComponent(const string name, SDL_Texture* const texture, const Position position,  SDL_Rect* const sourceArea = nullptr);
 
 	static void Finish();
 

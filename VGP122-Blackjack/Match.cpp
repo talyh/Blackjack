@@ -219,7 +219,7 @@ void Match::PlayRound()
 		GameRender::ClearScreen();
 		GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
 		GameRender::PrintText(&lblCredits, true);
-		GameRender::PrintText(&txtCredits);
+		GameRender::PrintText(&txtCredits, true);
 
 		// deal cards
 		DealInitialHands();
@@ -536,7 +536,6 @@ void Match::Hit(Player* currentPlayer, int hand)
 	dealer.DealCard(DrawCard(), currentPlayer, hand);
 	CalculatePlayerScore(currentPlayer, hand);
 	CheckPlayerCards(currentPlayer, false, hand);
-	
 }
 
 void Match::Split()

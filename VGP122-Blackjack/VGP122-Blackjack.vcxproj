@@ -126,7 +126,6 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="Dealer.h" />
     <ClInclude Include="Deck.h" />
-    <ClInclude Include="Definitions.h" />
     <ClInclude Include="Human.h" />
     <ClInclude Include="Match.h" />
     <ClInclude Include="Player.h" />

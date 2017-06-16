@@ -33,11 +33,12 @@ public:
 	bool getVisibility();
 	bool GetLoaded();
 	string GetFilename();
+	SDL_Rect* const GetSource();
 
-	void setWidth(int width);
-	void setHeight(int height);
-	void setXPos(int x);
-	void setYPos(int y);
+	void setWidth(int width); // size of each fram
+	void setHeight(int height); // size of each frame
+	void setXPos(int x); // screen position in X
+	void setYPos(int y); // screen position in y
 	void setVisible(bool visible);
 
 	void load(const char* filename, SDL_Renderer *renderer);

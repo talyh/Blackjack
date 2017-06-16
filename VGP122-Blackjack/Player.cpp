@@ -21,16 +21,6 @@ void Player::ReceiveCard(Card* card, int hand)
 
 	AdditionalTasksOnReceiveCard();
 
-	/*Position p;
-	if (type == "dealer")
-	{
-		p = { Common::dealerHandXPos, Common::dealerHandYPos };	
-	}
-	else
-	{
-		p = { Common::playerHandYPos, Common::playerHandYPos };
-	}*/
-
 	GameRender::DrawElement(card, (type == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * hands[hand].size()));
 }
 
