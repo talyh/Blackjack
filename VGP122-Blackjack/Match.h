@@ -21,6 +21,8 @@ public:
 
 	void PlayRound();
 
+	void RedrawTable();
+
 	Card DrawCard();
 
 	void DealInitialHands();

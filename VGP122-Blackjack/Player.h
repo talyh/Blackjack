@@ -43,6 +43,8 @@ public:
 
 	void ShowHiddenCards();
 
+	string GetType();
+
 	static const int INITIAL_HANDS{ 1 };
 	static const int INITIAL_HAND_SIZE{ 2 };
 

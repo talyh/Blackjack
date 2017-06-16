@@ -128,6 +128,11 @@ void Player::ShowHiddenCards()
 	}
 }
 
+string Player::GetType()
+{
+	return type;
+}
+
 void Player::AdditionalTasksOnReceiveCard()
 {
 }

@@ -252,10 +252,7 @@ void Match::PlayRound()
 		GetBet(&betting);
 
 		// redraw screen
-		GameRender::ClearScreen();
-		GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
-		GameRender::PrintText(&lblCredits, true);
-		GameRender::PrintText(&txtCredits, true);
+		RedrawTable();
 
 		// deal cards
 		DealInitialHands();
@@ -284,10 +281,36 @@ void Match::PlayRound()
 				LetHousePlay();
 			}
 
+
+			Sleep(3000);
 			// finish round
 			FinishRound();
 		}
 	}	
+}
+
+void Match::RedrawTable()
+{
+	GameRender::ClearScreen();
+	GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
+	GameRender::PrintText(&lblCredits, true);
+	GameRender::PrintText(&txtCredits, true);
+
+	if (!beginningRound && !finishedRound)
+	{
+		for (Player* player : players)
+		{
+			for (vector<Card> hand : player->GetHands())
+			{
+				int i { 1 } ;
+				for (Card card : hand)
+				{
+					GameRender::DrawElement(&card, ( player->GetType() == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * i) );
+					i++;
+				}
+			}
+		}
+	}
 }
 
 Card Match::DrawCard() {
@@ -391,6 +414,10 @@ void Match::GetBet(bool listening)
 						{
 							listening = false;
 						}
+						else
+						{
+							break;
+						}
 
 						GameRender::ClearScreen(true);
 						txtCredits.value = to_string(roundCredits);
@@ -458,13 +485,19 @@ void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 		*allBusted = (allBusted && handBusted);
 		i++;
 	}
+
+
 }
 
 void Match::LetHousePlay()
 {
 	dealerPlayed = true;
 	dealer.ShowHiddenCards();
-	dealer.ViewSingleHand();
+	
+	RedrawTable();
+
+
+
 	while (dealer.GetHandScore() < 17)
 	{
 		Hit(&dealer);
@@ -545,6 +578,10 @@ void Match::GetPlay(bool* beginningRound, bool splitable)
 						{
 							Split();
 						}
+						else
+						{
+							break;
+						}
 
 						if (txtMessage.value != "")
 						{
@@ -558,6 +595,11 @@ void Match::GetPlay(bool* beginningRound, bool splitable)
 						{
 							btnHit.image->setVisible(false);
 							btnStay.image->setVisible(false);
+						}
+						if (!player.GetSecondHandStatus())
+						{
+							btnHit2.image->setVisible(false);
+							btnStay2.image->setVisible(false);
 						}
 
 						GameRender::ClearScreen(true);
