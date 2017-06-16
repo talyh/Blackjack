@@ -176,6 +176,8 @@ Textbox txtMessage {
 	""
 };
 
+bool betting = true;
+
 Match::Match() : gameStatus{ notStarted } 
 { 
 	// assign players to the players vector pointer
@@ -236,20 +238,19 @@ void Match::PlayRound()
 
 	while (!finishedRound)
 	{
-		GameRender::ClearScreen(true);
+		//GameRender::ClearScreen(true);
 		// show avatar
-		GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
+		//GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
 
-		// show credits
-		GameRender::PrintText(&lblCredits, true);
-		txtCredits.value = to_string(player.GetCredits());
-		txtCredits.position.xPos = lblCredits.position.xPos + lblCredits.size.width + PADDING;
-		txtCredits.position.yPos = lblCredits.position.yPos,
-		GameRender::PrintText(&txtCredits);
+		//// show credits
+		//GameRender::PrintText(&lblCredits, true);
+		//txtCredits.value = to_string(player.GetCredits());
+		//txtCredits.position.xPos = lblCredits.position.xPos + lblCredits.size.width + PADDING;
+		//txtCredits.position.yPos = lblCredits.position.yPos,
+		//GameRender::PrintText(&txtCredits);
 
 		// get bet
-		bool betting = true;
-		GetBet(&betting);
+		GetBet();
 
 		// redraw screen
 		RedrawTable();
@@ -257,17 +258,16 @@ void Match::PlayRound()
 		// deal cards
 		DealInitialHands();
 
-		// TODO
 		// check for immediate blackjacks
-		//for (Player* p : players)
-		//{
-		//	CalculatePlayerScore(p);
-		//}
-		//// if any of the players got a natural blackjack, jump to Finish Round
-		//if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
-		//{
-		//	FinishRound();
-		//}	
+		for (Player* p : players)
+		{
+			CalculatePlayerScore(p);
+		}
+		// if any of the players got a natural blackjack, jump to Finish Round
+		if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
+		{
+			FinishRound();
+		}	
 		
 		// get plays
 		if (!finishedRound)
@@ -281,8 +281,8 @@ void Match::PlayRound()
 				LetHousePlay();
 			}
 
-
 			Sleep(3000);
+
 			// finish round
 			FinishRound();
 		}
@@ -293,9 +293,29 @@ void Match::RedrawTable()
 {
 	GameRender::ClearScreen();
 	GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
-	GameRender::PrintText(&lblCredits, true);
-	GameRender::PrintText(&txtCredits, true);
 
+	if (betting)
+	{
+		GameRender::PrintText(&lblCredits, true);
+		txtCredits.value = to_string(roundCredits);
+		txtCredits.position.xPos = lblCredits.position.xPos + lblCredits.size.width + PADDING;
+		txtCredits.position.yPos = lblCredits.position.yPos;
+		GameRender::PrintText(&txtCredits);
+
+		GameRender::PrintText(&lblBet, true);
+		txtBet.value = to_string(bets[0]);
+		txtBet.position = { lblBet.position.xPos + lblBet.size.width + PADDING , lblBet.position.yPos };
+		GameRender::PrintText(&txtBet);
+		GameRender::DrawElement(&btnBetUp);
+		GameRender::DrawElement(&btnBetDown);
+		GameRender::DrawElement(&btnBetConfirm);		
+	}
+	else
+	{
+		GameRender::PrintText(&lblCredits, true);
+		GameRender::PrintText(&txtCredits, true);
+	}
+	
 	if (!beginningRound && !finishedRound)
 	{
 		for (Player* player : players)
@@ -337,26 +357,28 @@ void Match::DealInitialHands()
 	}
 }
 
-void Match::GetBet(bool listening)
+void Match::GetBet()
 {
 	bets[0] = initialBet;
 	roundCredits = player.GetCredits() - bets[0];
 	txtCredits.value = to_string(roundCredits);
 	txtBet.value = to_string(bets[0]);
 	
-	GameRender::ClearScreen(true);
+	RedrawTable();
+
+	/*GameRender::ClearScreen(true);
 	GameRender::PrintText(&lblBet, true);
 	GameRender::DrawElement(&btnBetUp);
 	GameRender::DrawElement(&btnBetDown);
-	GameRender::DrawElement(&btnBetConfirm);
+	GameRender::DrawElement(&btnBetConfirm);*/
 
-	while (listening)
+	while (betting)
 	{
 		if (SDL_GetTicks() - updatedTime >= deltaT)
 		{
-			txtBet.position = { lblBet.position.xPos + lblBet.size.width + PADDING , lblBet.position.yPos }; 
+			/*txtBet.position = { lblBet.position.xPos + lblBet.size.width + PADDING , lblBet.position.yPos }; 
 			GameRender::PrintText(&txtCredits);
-			GameRender::PrintText(&txtBet);
+			GameRender::PrintText(&txtBet);*/
 			
 			while (SDL_PollEvent(&matchEvent))
 			{
@@ -366,7 +388,7 @@ void Match::GetBet(bool listening)
 					case SDL_QUIT:
 					{
 						// Break out of loop to end game
-						listening = false;
+						betting = false;
 						exit(1);
 						break;
 					}
@@ -377,7 +399,7 @@ void Match::GetBet(bool listening)
 						if (matchEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 						{
 							// Break out of loop to end game
-							listening = false;
+							betting = false;
 							exit(1);
 						}
 						break;
@@ -412,16 +434,14 @@ void Match::GetBet(bool listening)
 						}
 						else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetConfirm.image))
 						{
-							listening = false;
+							betting = false;
 						}
 						else
 						{
 							break;
 						}
 
-						GameRender::ClearScreen(true);
-						txtCredits.value = to_string(roundCredits);
-						txtBet.value = to_string(bets[0]);
+						RedrawTable();
 						break;
 					}
 				}
@@ -470,7 +490,6 @@ void Match::ApplyInsurance()
 
 void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 {
-	
 	// play all hands
 	GetPlay(&beginningRound, player.GetSplitable());
 
@@ -495,8 +514,6 @@ void Match::LetHousePlay()
 	dealer.ShowHiddenCards();
 	
 	RedrawTable();
-
-
 
 	while (dealer.GetHandScore() < 17)
 	{
@@ -732,6 +749,7 @@ void Match::FinishRound(bool surrender)
 	{
 		currentPlayer->FinishRound();
 	}
+	betting = true;
 	dealerPlayed = false;
 	finishedRound = true;
 	insuranceApplied = false;

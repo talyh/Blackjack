@@ -27,7 +27,7 @@ public:
 
 	void DealInitialHands();
 
-	void GetBet(bool listening);
+	void GetBet();
 
 	void OfferSurrender();
 
