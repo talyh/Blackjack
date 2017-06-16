@@ -44,9 +44,6 @@ public:
 
 	static void Finish();
 
-	static const int SCREEN_WIDTH = 1024;
-	static const int SCREEN_HEIGHT = 720;
-
 	static const int AUDIO_RATE = 44100;
 	static const Uint16 AUDIO_FORMAT = AUDIO_S16;
 	static const int AUDIO_CHANNELS = 2;

@@ -19,18 +19,21 @@
 
 using namespace std;
 
-#define SCREEN_WIDTH GameRender::SCREEN_WIDTH
-#define SCREEN_HEIGHT GameRender::SCREEN_HEIGHT
-#define CARD_WIDTH CARD_H::SIZE.width
-#define CARD_HEIGHT CARD_H::SIZE.height
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 720
+#define CARD_WIDTH 72
+#define CARD_HEIGHT 96
 
 // define layout variables
-const int LINE_HEIGHT{ 20 };
-const int PADDING  { 20 };
+const int LINE_HEIGHT { 20 };
+const int PADDING { 20 };
 const Size START_MENU_BUTTON_SIZE { 383, 78 };
 const Size BET_BUTTON_SIZE { 32, 32 }; 
 const Size PLAY_BUTTON_SIZE { 32, 32 };
 const int BUTTON_PADDING { 8 };
+const int CARD_PADDING{ 15 };
+const Position DEALER_HAND_POSITION{ SCREEN_WIDTH / 2 - CARD_WIDTH, PADDING };
+const Position PLAYER_HAND_POSITION{ SCREEN_WIDTH / 2 - CARD_WIDTH, SCREEN_HEIGHT - CARD_HEIGHT - PADDING * 4 };
 
 // protoype functions
 void ListenForGameEvents(bool listening);
@@ -74,7 +77,7 @@ const string SFX_PAY_BET = "sdns/";
 const string SFX_GAME_OVER = "sdns/";
 // font
 const string FONT = "fnts/amer_typewriter.ttf";
-const int FONT_SIZE = 28;
+const int FONT_SIZE { 28 };
 
 class Common
 {
@@ -85,5 +88,6 @@ public:
 		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
 };
+
 #endif
 

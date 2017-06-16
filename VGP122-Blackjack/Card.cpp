@@ -23,7 +23,7 @@ void Card::SetFaceValue(string face)
 
 void Card::SetImage()
 {
-	image = new Sprite(SPRITESHEET.c_str(), 0, 0, SIZE.width, SIZE.height);
+	image = new Sprite(SPRITESHEET.c_str(), 0, 0, CARD_WIDTH, CARD_HEIGHT);
 	if (suit == "Clubs")
 	{
 		image->setRow(0);

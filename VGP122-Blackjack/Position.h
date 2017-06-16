@@ -57,6 +57,28 @@ struct Position
 		z /= rhs;
 		return z;
 	}
+
+	Position& Position::operator=(const Position & rhs)
+	{
+		xPos = rhs.xPos;
+		yPos = rhs.yPos;
+		return *this;
+	}
+	friend bool operator==(const Position & lhs, const Position & rhs)
+	{
+		if (lhs.xPos == rhs.xPos && lhs.yPos == rhs.yPos)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	friend bool operator!=(const Position & lhs, const Position & rhs)
+	{
+		return !(rhs == lhs);
+	}
 };
 
 #endif // !POSITION_H

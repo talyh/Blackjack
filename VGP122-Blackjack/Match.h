@@ -54,7 +54,7 @@ public:
 			// returns 2 for Natural Blackjack
 			// returns 3 for 21 points
 
-	void ViewPlayerGame(Player* currentPlayer, bool showScore = true, int hand = 0);
+	//void ViewPlayerGame(Player* currentPlayer, bool showScore = true, int hand = 0);
 
 	void PayBet(int playerResult, int hand = 0);
 

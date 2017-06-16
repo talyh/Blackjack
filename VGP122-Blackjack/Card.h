@@ -7,8 +7,8 @@
 
 const array<string, 13> FACES{ "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
 const array<string, 4> SUITS{ "Hearts", "Diamonds", "Clubs", "Spades" };
-const string SPRITESHEET { CARDS_IMAGE };
-const Size SIZE { 72, 96 };
+
+const string SPRITESHEET = CARDS_IMAGE;
 
 class Card
 {

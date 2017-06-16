@@ -18,6 +18,20 @@ void Player::ReceiveCard(Card* card, int hand)
 	}
 	// place new card at the end of the selected row
 	hands[hand].push_back(*card);
+
+	AdditionalTasksOnReceiveCard();
+
+	/*Position p;
+	if (type == "dealer")
+	{
+		p = { Common::dealerHandXPos, Common::dealerHandYPos };	
+	}
+	else
+	{
+		p = { Common::playerHandYPos, Common::playerHandYPos };
+	}*/
+
+	GameRender::DrawElement(card, (type == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * hands[hand].size()));
 }
 
 void Player::Stay(int hand)
@@ -104,4 +118,8 @@ void Player::ShowHiddenCards()
 			}
 		}
 	}
+}
+
+void Player::AdditionalTasksOnReceiveCard()
+{
 }

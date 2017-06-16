@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "Common.h"
+#include "GameRender.h"
 #include "Card.h"
 
 class Player
@@ -42,6 +43,8 @@ public:
 	static const int INITIAL_HAND_SIZE{ 2 };
 
 protected:
+	virtual void AdditionalTasksOnReceiveCard();
+	
 	vector<vector<Card>> hands; // to store the Cards the player is holding, allowing for multiple hands at the same time
 	vector<bool> handsActive; // to control whether each hand is active or not
 	vector<int> handsScore; // to control the accumulated score for each hand
