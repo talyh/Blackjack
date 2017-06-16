@@ -21,7 +21,7 @@ public:
 
 	void PlayRound();
 
-	Card* DrawCard();
+	Card DrawCard();
 
 	void DealInitialHands();
 

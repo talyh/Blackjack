@@ -107,7 +107,17 @@ void Card::DeleteImage()
 
 void Card::Flip()
 {
-	faceUp = !faceUp;
+	if (faceUp)
+	{
+		faceUp = false;
+		image->setRow(4);
+		image->setCurrentFrame(0);
+	}
+	else
+	{
+		faceUp = !faceUp;
+		SetImage();
+	}
 }
 
 const string Card::GetFace()

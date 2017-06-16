@@ -10,15 +10,15 @@ class Player
 public:
 	Player();
 
-	virtual void ReceiveCard(Card* card, int hand = 0); // puts a card in the player's hand
+	virtual void ReceiveCard(Card card, int hand = 0); // puts a card in the player's hand
 	
 	void Stay(int hand = 0);
 
 	Card* GetCard(int hand, int position);
 
-	vector<Card*> GetSingleHand(int hand); // returns the raw vector of one of the player's hands
+	vector<Card> GetSingleHand(int hand); // returns the raw vector of one of the player's hands
 
-	vector<vector<Card*>> GetHands(); // returns the raw vector of hands
+	vector<vector<Card>> GetHands(); // returns the raw vector of hands
 
 	vector<bool> GetHandsStatus();	// returns the status of all the player's hands
 									// FALSE for a hand that has finished playing
@@ -49,7 +49,7 @@ public:
 protected:
 	virtual void AdditionalTasksOnReceiveCard();
 	
-	vector<vector<Card*>> hands; // to store the Cards the player is holding, allowing for multiple hands at the same time
+	vector<vector<Card>> hands; // to store the Cards the player is holding, allowing for multiple hands at the same time
 	vector<bool> handsActive; // to control whether each hand is active or not
 	vector<int> handsScore; // to control the accumulated score for each hand
 	string type; // to store the type of player (guest or dealer)

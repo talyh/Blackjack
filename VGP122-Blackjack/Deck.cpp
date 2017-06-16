@@ -24,9 +24,9 @@ void Deck::Shuffle(size_t shuffles)
 	}
 }
 
-Card* Deck::GetCard()
+Card Deck::GetCard()
 {
-	Card* selected = &cards[0];
+	Card selected = cards[0];
 	cards.erase(cards.begin() + 0);
 	return selected;
 }

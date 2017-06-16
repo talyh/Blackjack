@@ -290,7 +290,7 @@ void Match::PlayRound()
 	}	
 }
 
-Card* Match::DrawCard() {
+Card Match::DrawCard() {
 	if (deck->GetDeckSize() < 1)
 	{
 		// create new deck
@@ -308,7 +308,7 @@ void Match::DealInitialHands()
 	{
 		for (size_t j{ 0 }; j < players[i]->INITIAL_HAND_SIZE; j++)
 		{
-			Card* c = DrawCard();
+			Card c = DrawCard();
 			dealer.DealCard(c, players[i]);
 		}
 	}
@@ -449,7 +449,7 @@ void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 
 	// check if any of the player's hand still has a wiinning chance	
 	int i{ 0 };
-	for (vector<Card*> hand : player.GetHands())
+	for (vector<Card> hand : player.GetHands())
 	{
 		int handResult = CheckPlayerCards(&player, false, i);
 		bool handWon = (handResult == 2 || handResult == 3);
@@ -596,7 +596,7 @@ void Match::Split()
 	}
 
 	int i{0};
-	for (vector<Card*> hand : player.GetHands())
+	for (vector<Card> hand : player.GetHands())
 	{
 		Hit(&player, i);
 		i++;
@@ -631,7 +631,7 @@ void Match::FinishRound(bool surrender)
 		cout << "---------- You ----------" << endl;
 		int i{ 0 };
 		int dealerRoundResult = dealer.GetHandScore();
-		for (vector<Card*> hand : player.GetHands())
+		for (vector<Card> hand : player.GetHands())
 		{
 			//ViewPlayerGame(&player, true, i);
 			int handRoundResult = player.GetHandScore(i);
@@ -713,12 +713,12 @@ void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 	int handScore{ 0 };
 	int i{ 0 };
 	int aces{ 0 };
-	for (Card* card : currentPlayer->GetSingleHand(hand))
+	for (Card card : currentPlayer->GetSingleHand(hand))
 	{
 		// loop through regular cards first to assess how As should behave
-		if (card->GetFace() != "A")
+		if (card.GetFace() != "A")
 		{
-			handScore += card->GetFaceValue();
+			handScore += card.GetFaceValue();
 		}
 		else
 		{

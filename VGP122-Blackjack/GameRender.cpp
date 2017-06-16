@@ -205,20 +205,23 @@ void GameRender::DrawElement(Button* button, bool save)
 
 void GameRender::DrawElement(Card* card, Position position)
 {
-	if (card->GetFaceUp())
-	{
-		DrawElement(card->GetImage(), position);
-		SaveComponent(card->GetFace() + " of " + card->GetSuit(), card->GetImage()->getImage(), { card->GetImage()->getXPos(), card->GetImage()->getYPos() }, card->GetImage()->GetSource());
-	}
-	else
-	{
-		Sprite* cardBack = new Sprite(CARD_BACK_IMAGE.c_str(), position.xPos, position.yPos, CARD_WIDTH, CARD_HEIGHT, renderer);
-		DrawElement(cardBack, position);
-		SDL_Rect src { 0, 0, CARD_WIDTH, CARD_HEIGHT };
-		SaveComponent("card back", cardBack->getImage(), { cardBack->getXPos(), cardBack->getYPos() }, &src);
-		delete cardBack;
-		cardBack = nullptr;
-	}
+	DrawElement(card->GetImage(), position);
+	SaveComponent(card->GetFace() + " of " + card->GetSuit(), card->GetImage()->getImage(), { card->GetImage()->getXPos(), card->GetImage()->getYPos() }, card->GetImage()->GetSource());
+	
+	//if (card->GetFaceUp())
+	//{
+	//	DrawElement(card->GetImage(), position);
+	//	SaveComponent(card->GetFace() + " of " + card->GetSuit(), card->GetImage()->getImage(), { card->GetImage()->getXPos(), card->GetImage()->getYPos() }, card->GetImage()->GetSource());
+	//}
+	//else
+	//{
+	//	Sprite* cardBack = new Sprite(CARD_BACK_IMAGE.c_str(), position.xPos, position.yPos, CARD_WIDTH, CARD_HEIGHT, renderer);
+	//	DrawElement(cardBack, position);
+	//	//SDL_Rect src { 0, 0, CARD_WIDTH, CARD_HEIGHT };
+	//	SaveComponent("card back", cardBack->getImage(), { cardBack->getXPos(), cardBack->getYPos() });
+	//	delete cardBack;
+	//	cardBack = nullptr;
+	//}
 }
 
 void GameRender::PrintText(Textbox* textbox, bool save)

@@ -10,7 +10,7 @@ public:
 
 	void Shuffle(size_t shuffles);
 
-	Card* GetCard();
+	Card GetCard();
 
 	int GetDeckSize();
 

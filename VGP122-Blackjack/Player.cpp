@@ -6,12 +6,12 @@ Player::Player() : hands(Player::INITIAL_HANDS), handsActive(Player::INITIAL_HAN
 	handsScore[0] = 0;
 }
 
-void Player::ReceiveCard(Card* card, int hand)
+void Player::ReceiveCard(Card card, int hand)
 {
 	// if there's not yet a hand "row" to store cards, create a new row and mark that hand active
 	if (hands.size() <= hand)
 	{
-		vector<Card*> temp;
+		vector<Card> temp;
 		hands.push_back(temp);
 		Player::handsActive.push_back(true);
 		Player::handsScore.push_back(0);
@@ -21,7 +21,7 @@ void Player::ReceiveCard(Card* card, int hand)
 
 	AdditionalTasksOnReceiveCard();
 
-	GameRender::DrawElement(card, (type == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * hands[hand].size()));
+	GameRender::DrawElement(&hands[hand][hands[hand].size() - 1], (type == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * hands[hand].size()));
 }
 
 void Player::Stay(int hand)
@@ -31,15 +31,15 @@ void Player::Stay(int hand)
 
 Card* Player::GetCard(int hand, int position)
 {
-	return hands[hand][position];
+	return &hands[hand][position];
 }
 
-vector<Card*> Player::GetSingleHand(int hand)
+vector<Card> Player::GetSingleHand(int hand)
 {
 	return hands[hand];
 }
 
-vector<vector<Card*>> Player::GetHands()
+vector<vector<Card>> Player::GetHands()
 {
 	return hands;
 }
@@ -101,14 +101,14 @@ void Player::ViewSingleHand(int hand, bool showHandNumber)
 
 void Player::FinishRound()
 {
-	for (vector<Card*> hand : hands)
+	for (vector<Card> hand : hands)
 	{
-		for (Card* card : hand)
+		for (Card card : hand)
 		{
-			card->DeleteImage();
+			card.DeleteImage();
 		}
 	}
-	hands = *(new vector<vector<Card*>>(1));
+	hands = *(new vector<vector<Card>>(1));
 	handsActive = *(new vector<bool>(1));
 	handsActive[0] = true;
 	handsScore = *(new vector<int>(1));
@@ -120,9 +120,9 @@ void Player::ShowHiddenCards()
 	{
 		for (size_t j{ 0 }; j < hands[i].size(); j++)
 		{
-			if (!hands[i][j]->GetFaceUp())
+			if (!hands[i][j].GetFaceUp())
 			{
-				hands[i][j]->Flip();
+				hands[i][j].Flip();
 			}
 		}
 	}
