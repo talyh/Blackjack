@@ -25,7 +25,7 @@ int GameRender::Initialize(string gameFont, int fontSize)
 	}
 	else
 	{
-		cout << "SDL_Init successful" << endl;
+		//cout << "SDL_Init successful" << endl;
 	}
 	// Close SDL at program end
 	atexit(SDL_Quit);
@@ -39,7 +39,7 @@ int GameRender::Initialize(string gameFont, int fontSize)
 	} 
 	else
 	{
-		cout << "Window created" << endl;
+		//cout << "Window created" << endl;
 	}
 
 	// Initialize Renderer
@@ -51,7 +51,7 @@ int GameRender::Initialize(string gameFont, int fontSize)
 	}
 	else
 	{
-		cout << "Renderer created" << endl;
+		//cout << "Renderer created" << endl;
 	}
 
 	// initialize font library
@@ -84,7 +84,6 @@ int GameRender::Initialize(string gameFont, int fontSize)
 void GameRender::SetBackground(string backgroundImagePath)
 {
 	// create a new sprite, with the info provided
-	//Sprite* background = NULL;
 	background = new Sprite(backgroundImagePath.c_str(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, renderer);
 	itemsCreated.push_back(background);
 
@@ -101,7 +100,7 @@ void GameRender::SetMusic(string musicPath)
 	}
 	else
 	{
-		cout << "Playing music " << musicPath << endl;
+		//cout << "Playing music " << musicPath << endl;
 	}
 
 	// play music
@@ -117,7 +116,7 @@ void GameRender::DrawBackground()
 	SDL_RenderPresent(renderer);
 }
 
-void GameRender::DrawElement(string filename, int xPos, int yPos, int width, int height, Sprite** elementPtr, string saveName)
+void GameRender::DrawElement(string filename, int xPos, int yPos, int width, int height, Sprite** elementPtr, bool save, string saveName)
 {
 	// create a new sprite, with the info provided
 	Sprite* image = NULL;
@@ -133,7 +132,10 @@ void GameRender::DrawElement(string filename, int xPos, int yPos, int width, int
 	// redraw the renderer
 	SDL_RenderPresent(renderer);
 
-	SaveComponent((saveName != "" ? saveName : filename), image->getImage(), { image->getXPos(), image->getYPos() });
+	if (save)
+	{
+		SaveComponent((saveName != "" ? saveName : filename), image->getImage(), { image->getXPos(), image->getYPos() });
+	}
 }
 
 void GameRender::DrawElement(Sprite* image, Position position)
@@ -188,14 +190,15 @@ void GameRender::DrawElement(Component* c)
 	}
 }
 
-void GameRender::DrawElement(Button* button)
+void GameRender::DrawElement(Button* button, bool save)
 {
-	DrawElement(button->src, button->position.xPos, button->position.yPos, button->size.width, button->size.height, &(button->image), button->name);
+	DrawElement(button->src, button->position.xPos, button->position.yPos, button->size.width, button->size.height, &(button->image), save, button->name);
 	if (button->tooltip)
 	{
 		button->tooltip->setVisible(false);
-		DrawElement(button->tooltipSrc, button->position.xPos + button->size.width + BUTTON_PADDING, button->position.yPos + button->size.height / 2, button->tooltipSize.width, button->tooltipSize.height, &(button->tooltip), button->name + "Tooltip");
+		DrawElement(button->tooltipSrc, button->position.xPos + button->size.width + BUTTON_PADDING, button->position.yPos + button->size.height / 2, button->tooltipSize.width, button->tooltipSize.height, &(button->tooltip), save, button->name + "Tooltip");
 	}
+
 	itemsCreated.push_back(button->image);
 	itemsCreated.push_back(button->tooltip);
 }
@@ -205,20 +208,22 @@ void GameRender::DrawElement(Card* card, Position position)
 	if (card->GetFaceUp())
 	{
 		DrawElement(card->GetImage(), position);
+		SaveComponent(card->GetFace() + " of " + card->GetSuit(), card->GetImage()->getImage(), { card->GetImage()->getXPos(), card->GetImage()->getYPos() }, card->GetImage()->GetSource());
 	}
 	else
 	{
 		Sprite* cardBack = new Sprite(CARD_BACK_IMAGE.c_str(), position.xPos, position.yPos, CARD_WIDTH, CARD_HEIGHT, renderer);
 		DrawElement(cardBack, position);
+		SDL_Rect src { 0, 0, CARD_WIDTH, CARD_HEIGHT };
+		SaveComponent("card back", cardBack->getImage(), { cardBack->getXPos(), cardBack->getYPos() }, &src);
 		delete cardBack;
 		cardBack = nullptr;
 	}
-	SaveComponent(card->GetFace() + " of " + card->GetSuit(), card->GetImage()->getImage(), {card->GetImage()->getXPos(), card->GetImage()->getYPos()}, card->GetImage()->GetSource());
 }
 
 void GameRender::PrintText(Textbox* textbox, bool save)
 {
-	cout << "Printing text " << textbox->name << endl;
+	//cout << "Printing text " << textbox->name << endl;
 
 	// set the text properties
 	SDL_Rect dest = { textbox->position.xPos, textbox->position.yPos }; // set textbox position, but allow for size to be defined later on
@@ -232,11 +237,14 @@ void GameRender::PrintText(Textbox* textbox, bool save)
 	surface = TTF_RenderText_Blended_Wrapped(font, textbox->value.c_str(), { 0,0,0 }, SCREEN_WIDTH - textbox->position.xPos);
 
 	// convert the text to image
-	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	if (surface)
+	{
+		texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-	// set the size of the text
-	dest.w = surface->w;
-	dest.h = surface->h;
+		// set the size of the text
+		dest.w = surface->w;
+		dest.h = surface->h;
+	}
 
 	textbox->size.width = dest.w;
 	textbox->size.height = dest.h;
@@ -264,7 +272,7 @@ void GameRender::PlaySound(string sfxPath, int loops)
 	}
 	else
 	{
-		cout << "Playing sound " << sfxPath << endl;
+		//cout << "Playing sound " << sfxPath << endl;
 	}
 
 	// play sound

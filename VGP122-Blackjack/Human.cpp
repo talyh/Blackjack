@@ -21,7 +21,7 @@ bool Human::ValidateBet(unsigned int bet, unsigned int multiplier)
 
 void Human::Split()
 {
-	Player::ReceiveCard(&hands[0][1], 1);
+	Player::ReceiveCard(hands[0][1], 1);
 	Player::hands[0].pop_back();
 }
 
@@ -38,5 +38,5 @@ bool Human::GetSplitable()
 
 void Human::DetermineSplitable()
 {
-	splitableHand = (hands[0][0].GetFace() == hands[0][1].GetFace() && hands[0].size() == 2);
+	splitableHand = (hands[0][0]->GetFace() == hands[0][1]->GetFace() && hands[0].size() == 2);
 }

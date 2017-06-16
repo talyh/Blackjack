@@ -12,7 +12,7 @@ void Dealer::AdditionalTasksOnReceiveCard()
 	// if it's the dealer's very first card, hide it
 	if (hands[0].size() == 1)
 	{
-		hands[0][0].Flip();
+		hands[0][0]->Flip();
 	}
 }
 
@@ -24,10 +24,10 @@ bool Dealer::GetHandRisk()
 
 void Dealer::DetermineRiskyHand()
 {
-	for (Card c : hands[0])
+	for (Card* c : hands[0])
 	{
 		// if the dealer has an Ace showing, their hand is risky
-		riskyHand = (c.GetFace() == "A" && c.GetFaceUp() == true);
+		riskyHand = (c->GetFace() == "A" && c->GetFaceUp() == true);
 	}
 }
 

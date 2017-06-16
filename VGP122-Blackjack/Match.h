@@ -35,7 +35,7 @@ public:
 
 	void LetHousePlay();
 
-	void GetPlay(bool* beginningRound, bool splitable, int hand = 0);
+	void GetPlay(bool* beginningRound, bool splitable);
 
 	void Hit(Player* currentPlayer, int hand = 0);
 

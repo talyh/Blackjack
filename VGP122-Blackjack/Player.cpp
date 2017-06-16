@@ -11,13 +11,13 @@ void Player::ReceiveCard(Card* card, int hand)
 	// if there's not yet a hand "row" to store cards, create a new row and mark that hand active
 	if (hands.size() <= hand)
 	{
-		vector<Card> temp;
+		vector<Card*> temp;
 		hands.push_back(temp);
 		Player::handsActive.push_back(true);
 		Player::handsScore.push_back(0);
 	}
 	// place new card at the end of the selected row
-	hands[hand].push_back(*card);
+	hands[hand].push_back(card);
 
 	AdditionalTasksOnReceiveCard();
 
@@ -31,15 +31,15 @@ void Player::Stay(int hand)
 
 Card* Player::GetCard(int hand, int position)
 {
-	return &hands[hand][position];
+	return hands[hand][position];
 }
 
-vector<Card> Player::GetSingleHand(int hand)
+vector<Card*> Player::GetSingleHand(int hand)
 {
 	return hands[hand];
 }
 
-vector<vector<Card>> Player::GetHands()
+vector<vector<Card*>> Player::GetHands()
 {
 	return hands;
 }
@@ -48,6 +48,24 @@ vector<bool> Player::GetHandsStatus()
 {
 	return handsActive;
 }
+
+bool Player::GetFirstHandStatus()
+{
+	return handsActive[0];
+}
+
+bool Player::GetSecondHandStatus()
+{
+	if (handsActive.size() > 1)
+	{
+		return handsActive[1];
+	}
+	else
+	{
+		return handsActive[0];
+	}
+}
+
 
 int Player::GetHandScore(int hand)
 {
@@ -66,7 +84,7 @@ void Player::SetHandScore(int score, int hand)
 
 void Player::ViewSingleHand(int hand, bool showHandNumber)
 {
-	int i{ 0 };
+	/*int i{ 0 };
 		cout << "--------- Hand " << (showHandNumber ? to_string(hand + 1) + " " : "--") << "--------" << endl;
 		for (Card card : hands[hand])
 		{
@@ -78,19 +96,19 @@ void Player::ViewSingleHand(int hand, bool showHandNumber)
 			{
 				cout << "<< Card is hidden >>" << endl;
 			}
-		}
+		}*/
 }
 
 void Player::FinishRound()
 {
-	for (vector<Card> hand : hands)
+	for (vector<Card*> hand : hands)
 	{
-		for (Card card : hand)
+		for (Card* card : hand)
 		{
-			card.DeleteImage();
+			card->DeleteImage();
 		}
 	}
-	hands = *(new vector<vector<Card>>(1));
+	hands = *(new vector<vector<Card*>>(1));
 	handsActive = *(new vector<bool>(1));
 	handsActive[0] = true;
 	handsScore = *(new vector<int>(1));
@@ -102,9 +120,9 @@ void Player::ShowHiddenCards()
 	{
 		for (size_t j{ 0 }; j < hands[i].size(); j++)
 		{
-			if (!hands[i][j].GetFaceUp())
+			if (!hands[i][j]->GetFaceUp())
 			{
-				hands[i][j].Flip();
+				hands[i][j]->Flip();
 			}
 		}
 	}

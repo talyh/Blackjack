@@ -16,13 +16,17 @@ public:
 
 	Card* GetCard(int hand, int position);
 
-	vector<Card> GetSingleHand(int hand); // returns the raw vector of one of the player's hands
+	vector<Card*> GetSingleHand(int hand); // returns the raw vector of one of the player's hands
 
-	vector<vector<Card>> GetHands(); // returns the raw vector of hands
+	vector<vector<Card*>> GetHands(); // returns the raw vector of hands
 
 	vector<bool> GetHandsStatus();	// returns the status of all the player's hands
 									// FALSE for a hand that has finished playing
 									// TRUE for a hand that is still playing
+
+	bool GetFirstHandStatus();
+
+	bool GetSecondHandStatus();
 
 	int GetHandScore(int hand = 0); // returns the current points accumulated for a given hand
 	
@@ -45,7 +49,7 @@ public:
 protected:
 	virtual void AdditionalTasksOnReceiveCard();
 	
-	vector<vector<Card>> hands; // to store the Cards the player is holding, allowing for multiple hands at the same time
+	vector<vector<Card*>> hands; // to store the Cards the player is holding, allowing for multiple hands at the same time
 	vector<bool> handsActive; // to control whether each hand is active or not
 	vector<int> handsScore; // to control the accumulated score for each hand
 	string type; // to store the type of player (guest or dealer)

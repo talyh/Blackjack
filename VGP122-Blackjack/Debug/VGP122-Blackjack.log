@@ -1,8 +1,8 @@
-﻿  GameRender.cpp
+﻿  Player.cpp
+h:\vgp122-blackjack\vgp122-blackjack\player.cpp(12): warning C4018: '<=': signed/unsigned mismatch
+  Dealer.cpp
   Generating Code...
   Skipping... (no relevant changes detected)
-  Deck.cpp
-  CollisionDetection.cpp
-  Card.cpp
+  Blackjack.cpp
   VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.exe
   VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.pdb (Partial PDB)

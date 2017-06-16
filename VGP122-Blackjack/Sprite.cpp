@@ -29,7 +29,7 @@ Sprite::Sprite(const char* filename, int xpos, int ypos, int width, int height, 
 
 	name = filename;
 
-	cout << "Image " << name << " created" << endl;
+	// cout << "Image " << name << " created" << endl;
 }
 
 Sprite::~Sprite()
@@ -67,7 +67,7 @@ void Sprite::draw( SDL_Renderer *renderer)
 		/** Draw Sprite to Screen */
 		SDL_RenderCopy(renderer, image, &source, &dest);
 
-		cout << "Image " << name << " drawn" << endl;
+		// cout << "Image " << name << " drawn" << endl;
 	}
 	else
 	{

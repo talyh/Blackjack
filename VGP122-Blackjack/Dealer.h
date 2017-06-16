@@ -10,7 +10,7 @@ public:
 
 	void DealCard(Card* card, Player* currentPlayer, int hand = 0); // to distribute cards to players
 
-	virtual void AdditionalTasksOnReceiveCard() override;
+	void AdditionalTasksOnReceiveCard() override;
 
 	bool GetHandRisk(); // to get the riskiness of a hand, based on Ace showing
 

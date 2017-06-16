@@ -25,13 +25,13 @@ public:
 
 	static void DrawBackground();
 
-	static void DrawElement(string filename, int xPos, int yPos, int width, int height, Sprite** elementPtr, string saveName = "");
+	static void DrawElement(string filename, int xPos, int yPos, int width, int height, Sprite** elementPtr, bool save = true, string saveName = "");
 
 	static void DrawElement(Sprite* image, Position position);
 
 	static void DrawElement(Component* c);
 
-	static void DrawElement(Button* button);
+	static void DrawElement(Button* button, bool save = true);
 
 	static void DrawElement(Card* card, Position position);
 

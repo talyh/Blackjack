@@ -19,6 +19,7 @@ struct Button
 	Size tooltipSize { 0, 0 };
 	string tooltipSrc { "" };
 	Sprite* tooltip { nullptr };
+	bool enabled { true };
 };
 
 #endif // !BUTTON_H
