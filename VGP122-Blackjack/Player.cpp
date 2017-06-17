@@ -18,6 +18,24 @@ void Player::ReceiveCard(Card card, int hand)
 	}
 	// place new card at the end of the selected row
 	hands[hand].push_back(card);
+
+	AdditionalTasksOnReceiveCard();
+
+	if (type == "dealer")
+	{
+		GameRender::DrawElement(&hands[hand][hands[hand].size() - 1], DEALER_HAND_POSITION + CARD_PADDING * hands[hand].size());
+	}
+	else
+	{
+		if (hand == 0)
+		{
+			GameRender::DrawElement(&hands[hand][hands[hand].size() - 1], PLAYER_HAND_POSITION + CARD_PADDING * hands[hand].size());
+		}
+		else
+		{
+			GameRender::DrawElement(&hands[hand][hands[hand].size() - 1], PLAYER_HAND2_POSITION + CARD_PADDING * hands[hand].size());
+		}
+	}
 }
 
 void Player::Stay(int hand)
@@ -45,6 +63,24 @@ vector<bool> Player::GetHandsStatus()
 	return handsActive;
 }
 
+bool Player::GetFirstHandStatus()
+{
+	return handsActive[0];
+}
+
+bool Player::GetSecondHandStatus()
+{
+	if (handsActive.size() > 1)
+	{
+		return handsActive[1];
+	}
+	else
+	{
+		return handsActive[0];
+	}
+}
+
+
 int Player::GetHandScore(int hand)
 {
 	return handsScore[hand];
@@ -63,22 +99,29 @@ void Player::SetHandScore(int score, int hand)
 void Player::ViewSingleHand(int hand, bool showHandNumber)
 {
 	int i{ 0 };
-		cout << "--------- Hand " << (showHandNumber ? to_string(hand + 1) + " " : "--") << "--------" << endl;
-		for (Card card : hands[hand])
+	cout << "--------- Hand " << (showHandNumber ? to_string(hand + 1) + " " : "--") << "--------" << endl;
+	for (Card card : hands[hand])
+	{
+		if (card.GetFaceUp())
 		{
-			if (card.GetFaceUp())
-			{
-				card.ViewCard();
-			}
-			else
-			{
-				cout << "<< Card is hidden >>" << endl;
-			}
+			card.ViewCard();
 		}
+		else
+		{
+			cout << "<< Card is hidden >>" << endl;
+		}
+	}
 }
 
 void Player::FinishRound()
 {
+	for (vector<Card> hand : hands)
+	{
+		for (Card card : hand)
+		{
+			card.DeleteImage();
+		}
+	}
 	hands = *(new vector<vector<Card>>(1));
 	handsActive = *(new vector<bool>(1));
 	handsActive[0] = true;
@@ -97,4 +140,13 @@ void Player::ShowHiddenCards()
 			}
 		}
 	}
+}
+
+string Player::GetType()
+{
+	return type;
+}
+
+void Player::AdditionalTasksOnReceiveCard()
+{
 }

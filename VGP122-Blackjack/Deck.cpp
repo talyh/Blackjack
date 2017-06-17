@@ -7,6 +7,7 @@ Deck::Deck() : cards(FACES.size() * SUITS.size())
 		cards[i].SetFace(FACES[i % FACES.size()]);
 		cards[i].SetSuit(SUITS[i / FACES.size()]);
 		cards[i].SetFaceValue(cards[i].GetFace());
+		cards[i].SetImage();
 	}
 }
 
@@ -23,7 +24,7 @@ void Deck::Shuffle(size_t shuffles)
 	}
 }
 
-const Card Deck::GetCard()
+Card Deck::GetCard()
 {
 	Card selected = cards[0];
 	cards.erase(cards.begin() + 0);

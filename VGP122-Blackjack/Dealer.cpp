@@ -2,27 +2,18 @@
 
 Dealer::Dealer() { Player::type = "dealer"; }
 
-void Dealer::DealCard(Card card, Player * currentPlayer, int hand)
+void Dealer::DealCard(Card card, Player* currentPlayer, int hand)
 {
 	currentPlayer->ReceiveCard(card, hand);
 }
 
-void Dealer::ReceiveCard(Card card, int hand)
+void Dealer::AdditionalTasksOnReceiveCard()
 {
 	// if it's the dealer's very first card, hide it
-	if (empty(hands[0]))
+	if (hands[0].size() == 1)
 	{
-		card.Flip();
+		hands[0][0].Flip();
 	}
-	// if there's not yet a hand "row" to store cards, create a new row and mark that hand active
-	if (hands.size() <= hand)
-	{
-		vector<Card> temp;
-		hands.push_back(temp);
-		Player::handsActive.push_back(true);
-	}
-	// place new card at the end of the selected row
-	hands[hand].push_back(card);
 }
 
 bool Dealer::GetHandRisk()
@@ -39,5 +30,4 @@ void Dealer::DetermineRiskyHand()
 		riskyHand = (c.GetFace() == "A" && c.GetFaceUp() == true);
 	}
 }
-
 

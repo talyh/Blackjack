@@ -2,10 +2,13 @@
 #define  MATCH_H
 
 #include "Common.h"
+#include "CollisionDetection.h"
+#include "GameRender.h"
 #include "Deck.h"
 #include "Player.h"
 #include "Dealer.h"
 #include "Human.h"
+
 
 class Match
 {
@@ -18,13 +21,13 @@ public:
 
 	void PlayRound();
 
+	void RedrawTable();
+
 	Card DrawCard();
 
 	void DealInitialHands();
 
 	void GetBet();
-
-	void OfferSurrender();
 
 	void ApplyInsurance();
 
@@ -32,7 +35,7 @@ public:
 
 	void LetHousePlay();
 
-	void GetPlay(bool* beginningRound, bool splitable, int hand = 0);
+	void GetPlay(bool* beginningRound, bool splitable);
 
 	void Hit(Player* currentPlayer, int hand = 0);
 
@@ -51,8 +54,6 @@ public:
 			// returns 2 for Natural Blackjack
 			// returns 3 for 21 points
 
-	void ViewPlayerGame(Player* currentPlayer, bool showScore = true, int hand = 0);
-
 	void PayBet(int playerResult, int hand = 0);
 
 	int DecideAValue(int baseScore); // determines whether A should be counted as 1 or 11 and returns that value
@@ -60,7 +61,11 @@ public:
 	const enum GAMESTATUS { notStarted, running, over };
 	
 	static const int numberOfPlayers{ 2 };
-private:
+
+	const int initialBet { 10 };
+	const int betIncrement { 10 };
+
+private:	
 	const size_t SHUFFLES{ 100 }; // to determine how many times a deck should be shuffled on start
 	GAMESTATUS gameStatus; // to keep track of the game status and flow
 	Deck* deck; // to represent the deck of cards in use, can be replaced if the deck finishes

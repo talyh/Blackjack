@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "Common.h"
+#include "GameRender.h"
 #include "Card.h"
 
 class Player
@@ -23,6 +24,10 @@ public:
 									// FALSE for a hand that has finished playing
 									// TRUE for a hand that is still playing
 
+	bool GetFirstHandStatus();
+
+	bool GetSecondHandStatus();
+
 	int GetHandScore(int hand = 0); // returns the current points accumulated for a given hand
 	
 	void SetHandStatus(int hand, bool handStatus); // sets the status of a hand
@@ -38,10 +43,14 @@ public:
 
 	void ShowHiddenCards();
 
+	string GetType();
+
 	static const int INITIAL_HANDS{ 1 };
 	static const int INITIAL_HAND_SIZE{ 2 };
 
 protected:
+	virtual void AdditionalTasksOnReceiveCard();
+	
 	vector<vector<Card>> hands; // to store the Cards the player is holding, allowing for multiple hands at the same time
 	vector<bool> handsActive; // to control whether each hand is active or not
 	vector<int> handsScore; // to control the accumulated score for each hand

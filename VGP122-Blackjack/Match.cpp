@@ -1,5 +1,196 @@
 #include "Match.h"
 
+// initialize Event Variables
+SDL_Event matchEvent;
+
+// define overal layout elements
+// avatar
+Sprite *avatar = NULL;
+const Size AVATAR_SIZE{ 72, 72 };
+const string AVATAR_IMAGE = "imgs/avatar.png";
+const Position AVATAR_POSITION { 
+	PADDING , 
+	//SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING 
+	PADDING
+};
+
+// credits
+Textbox lblCredits {
+	"lblCredits",
+	AVATAR_POSITION.xPos + AVATAR_SIZE.width + PADDING, 
+	AVATAR_POSITION.yPos, 
+	0, 
+	0, 
+	"Credits: $" 
+};
+Textbox txtCredits { "txtCredits" };
+
+// bets
+const int LBL_BET_INITIAL_WIDTH = 50;
+Textbox lblBet {
+	"lblBet",
+	SCREEN_WIDTH / 6 - LBL_BET_INITIAL_WIDTH,
+	SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING * 8,
+	0,
+	0,
+	"Bet: "
+};
+Textbox txtBet {};
+Button btnBetUp {
+	"btnBetUp",
+	{
+		SCREEN_WIDTH / 6 + 50,
+		lblBet.position.yPos - BET_BUTTON_SIZE.height / 2 - BUTTON_PADDING
+	},
+	BET_BUTTON_SIZE,
+	BTN_BET_UP_IMAGE,
+	new Sprite(BTN_BET_UP_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+};
+Button btnBetDown {
+	"btnBetDown",
+	{
+		SCREEN_WIDTH / 6 + 50,
+		lblBet.position.yPos + BET_BUTTON_SIZE.height / 2 + BUTTON_PADDING
+	},
+	BET_BUTTON_SIZE,
+	BTN_BET_DOWN_IMAGE,
+	new Sprite(BTN_BET_DOWN_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+};
+Button btnBetConfirm {
+	"btnConfirm1",
+	{
+		btnBetUp.position.xPos + BET_BUTTON_SIZE.width + BUTTON_PADDING,
+		lblBet.position.yPos + BET_BUTTON_SIZE.height / 2
+	},
+	BET_BUTTON_SIZE,
+	BTN_BET_CONFIRM_IMAGE,
+	new Sprite(BTN_BET_CONFIRM_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	SFX_BET
+};
+Button btnHit {
+	"btnHit",
+	{ 
+		PADDING,
+		SCREEN_HEIGHT / 2 - PADDING * 6
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_HIT_IMAGE,
+	new Sprite(BTN_HIT_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	SFX_HIT,
+	{ 40, 23 },
+	BTN_HIT_TOOLTIP,
+	new Sprite(BTN_HIT_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnStay {
+	"btnStay",
+	{
+		btnHit.position.xPos,
+		btnHit.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_STAY_IMAGE,
+	new Sprite(BTN_STAY_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	"",
+	{ 50, 23 },
+	BTN_STAY_TOOLTIP,
+	new Sprite(BTN_STAY_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnHit2{
+	"btnHit",
+	{
+		SCREEN_WIDTH - PADDING * 4 - PLAY_BUTTON_SIZE.width,
+		btnHit.position.yPos
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_HIT_IMAGE,
+	new Sprite(BTN_HIT_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	SFX_HIT,
+	{ 40, 23 },
+	BTN_HIT_TOOLTIP,
+	new Sprite(BTN_HIT_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnStay2{
+	"btnStay",
+	{
+		btnHit2.position.xPos,
+		btnHit2.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_STAY_IMAGE,
+	new Sprite(BTN_STAY_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	"",
+	{ 50, 23 },
+	BTN_STAY_TOOLTIP,
+	new Sprite(BTN_STAY_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnDoubleDown {
+	"btnDoubleDown",
+	{
+		btnStay.position.xPos,
+		btnStay.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_DOUBLE_DOWN_IMAGE,
+	new Sprite(BTN_DOUBLE_DOWN_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	SFX_DOUBLE_DOWN,
+	{ 113, 23 },
+	BTN_DOUBLE_DOWN_TOOLTIP,
+	new Sprite(BTN_DOUBLE_DOWN_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnSplit {
+	"btnSplit",
+	{
+		btnDoubleDown.position.xPos,
+		btnDoubleDown.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_SPLIT_IMAGE,
+	new Sprite(BTN_SPLIT_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	SFX_DOUBLE_DOWN,
+	{ 50, 23 },
+	BTN_SPLIT_TOOLTIP,
+	new Sprite(BTN_SPLIT_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnSurrender {
+	"btnSurrender",
+	{
+		btnSplit.position.xPos,
+		btnSplit.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_SURRENDER_IMAGE,
+	new Sprite(BTN_SURRENDER_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	"",
+	{ 93, 23 },
+	BTN_SURRENDER_TOOLTIP,
+	new Sprite(BTN_SURRENDER_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnInsurance {
+	"btnInsurance",
+	{
+		btnSurrender.position.xPos,
+		btnSurrender.position.yPos + btnHit.size.height + BUTTON_PADDING,
+	},
+	PLAY_BUTTON_SIZE,
+	BTN_INSURANCE_IMAGE,
+	new Sprite(BTN_INSURANCE_IMAGE.c_str(), 0, 0, 0, 0, nullptr),
+	"",
+	{ 93, 23 },
+	BTN_INSURANCE_TOOLTIP,
+	new Sprite(BTN_INSURANCE_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
+};
+Textbox txtMessage {
+	"txtMessage",
+	PADDING,
+	SCREEN_HEIGHT - PADDING * 5,
+	0,
+	0,
+	""
+};
+
+bool betting = true;
+bool playing = false;
+
 Match::Match() : gameStatus{ notStarted } 
 { 
 	// assign players to the players vector pointer
@@ -20,19 +211,15 @@ int Match::GetGameStatus()
 
 void Match::PlayGame()
 {
-	system("cls");
 	gameStatus = running;
+	GameRender::ClearScreen();
 
 	// shuflle deck
 	deck->Shuffle(SHUFFLES);
 
-	cout << "----------------------------------------------" << endl;
-	cout << "                   Welcome !                  " << endl;
-	cout << "----------------------------------------------" << endl;
-	
 	// game runs while player has creddits
 	// if cards run out, a new deck is used
-	while (player.GetCredits() > 0)
+	while (player.GetCredits() > initialBet)
 	{
 		PlayRound();
 	}
@@ -44,63 +231,126 @@ void Match::PlayRound()
 	beginningRound = true;
 	finishedRound = false;
 
-	cout << "----------------- New Round ------------------" << endl;
-	cout << "You currently have $" << player.GetCredits() << endl;
-	GetBet();
-	cout << "You have $" << roundCredits << " left" << endl;
-	cout << "----------------------------------------------" << endl;
-	
-	DealInitialHands();
-	
-	for (Player* p : players)
+	while (!finishedRound)
 	{
-		CalculatePlayerScore(p);
-	}
+		// get bet
+		GetBet();
 
-	// if the two first cards in the player's main hand have the same face, they can be split
-	//splitable = (player.GetSingleHand(0)[0].GetFace() == player.GetSingleHand(0)[1].GetFace());
+		// redraw screen
+		RedrawTable();
 
-	// show cards
-	cout << "House: " << endl;
-	ViewPlayerGame(&dealer, false);
-	cout << "You: " << endl;
-	ViewPlayerGame(&player);
-	
-	// if dealer has a risky hand
-	if (dealer.GetHandRisk())
-	{
-		OfferSurrender();
-	}	
-	// if any of the players got a natural blackjack, jump to Finish Round
-	if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
-	{
-		FinishRound();
-	}	
-	// if not, play as usual
-	else
-	{
-		// player's turn
-		cout << "---------------- Your Turn ------------------" << endl;
+		// deal cards
+		DealInitialHands();
+
+		// check for immediate blackjacks
+		for (Player* p : players)
+		{
+			CalculatePlayerScore(p);
+		}
+
+		// if any of the players got a natural blackjack, jump to Finish Round
+		if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
+		{
+			// finish round
+			FinishRound();
+		}	
 		
+		// get plays
 		if (!finishedRound)
 		{
 			bool all21{ true };
 			bool allBusted{ true };
 			LetPlayerPlay(&all21, &allBusted);
-
-
-			if (!all21 && !allBusted)
+			
+			if (!finishedRound)
 			{
-				// house's turn
-				cout << "-------------- House Turn ------------------" << endl;
-				LetHousePlay();
-			}
+				if (!all21 && !allBusted)
+				{
+					LetHousePlay();
+				}
 
-			// finish round
-			FinishRound();
+				// finish round
+				FinishRound();
+			}
+		}
+	}	
+}
+
+void Match::RedrawTable()
+{
+	GameRender::ClearScreen();
+	GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
+
+	if (betting)
+	{
+		GameRender::PrintText(&lblCredits, true);
+		txtCredits.value = to_string(roundCredits);
+		txtCredits.position.xPos = lblCredits.position.xPos + lblCredits.size.width + PADDING;
+		txtCredits.position.yPos = lblCredits.position.yPos;
+		GameRender::PrintText(&txtCredits);
+
+		GameRender::PrintText(&lblBet, true);
+		txtBet.value = to_string(bets[0]);
+		txtBet.position = { lblBet.position.xPos + lblBet.size.width + PADDING , lblBet.position.yPos };
+		GameRender::PrintText(&txtBet);
+		GameRender::DrawElement(&btnBetUp);
+		GameRender::DrawElement(&btnBetDown);
+		GameRender::DrawElement(&btnBetConfirm);		
+	}
+	else
+	{
+		GameRender::PrintText(&lblCredits, true);
+		GameRender::PrintText(&txtCredits, true);
+	}
+	
+	if (playing)
+	{
+		if (player.GetFirstHandStatus())
+		{
+			GameRender::DrawElement(&btnHit);
+			GameRender::DrawElement(&btnStay);
+		}
+
+		if (player.GetHands().size() > 1 && player.GetSecondHandStatus())
+		{
+			GameRender::DrawElement(&btnHit2);
+			GameRender::DrawElement(&btnStay2);
 		}
 	}
-	cout << "----------------------------------------------" << endl;	
+	
+	for (Player* player : players)
+	{
+		int i { 0 };
+		for (vector<Card> hand : player->GetHands())
+		{
+			int j { 1 };
+			for (Card card : hand)
+			{
+				if (player->GetType() == "dealer")
+				{
+					GameRender::DrawElement(&card, DEALER_HAND_POSITION + (CARD_PADDING * j));
+				}
+				else
+				{
+					if (i == 0)
+					{
+						GameRender::DrawElement(&card, PLAYER_HAND_POSITION + (CARD_PADDING * j));
+					}
+					else
+					{
+						GameRender::DrawElement(&card, PLAYER_HAND2_POSITION + (CARD_PADDING * j));
+					}
+				}
+				j++;
+			}
+			i++;
+		}
+	}
+
+	if (txtMessage.value != "")
+	{
+		GameRender::PrintText(&txtMessage);
+	}
 }
 
 Card Match::DrawCard() {
@@ -111,6 +361,7 @@ Card Match::DrawCard() {
 		// shuflle deck
 		deck->Shuffle(SHUFFLES);
 	}
+
 	return deck->GetCard();
 }
 
@@ -127,51 +378,83 @@ void Match::DealInitialHands()
 
 void Match::GetBet()
 {
-	cout << "Enter the amount you'd like to bet: $";
-	cin >> bets[0];
+	bets[0] = initialBet;
+	roundCredits = player.GetCredits() - bets[0];
+	txtCredits.value = to_string(roundCredits);
+	txtBet.value = to_string(bets[0]);
+	
+	RedrawTable();
 
-	if (bets[0] > 0)
-	{	
-		if (player.ValidateBet(bets[0]))
+	while (betting)
+	{			
+		while (SDL_PollEvent(&matchEvent))
 		{
-			roundCredits = player.GetCredits() - bets[0];
-			cout << "Betting $" << bets[0] << endl;
-		}
-		else
-		{
-			cout << "Insuficient credits." << endl;
-			GetBet();
-		}
-	}
-	else
-	{
-		cout << "Invalid bet." << endl;
-		Common::FlushInput();
-		GetBet();
-	}
-}
+			switch (matchEvent.type)
+			{
+				// Check if user tries to quit the window
+				case SDL_QUIT:
+				{
+					// Break out of loop to end game
+					betting = false;
+					exit(0);
+					break;
+				}
+				//	Check if the ESC key was pressed
+				case SDL_KEYDOWN:
+				{
+					//	Check if 'ESC' was pressed
+					if (matchEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+					{
+						// Break out of loop to end game
+						betting = false;
+						exit(0);
+					}
+					break;
+				}
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					GameRender::PlaySFX(SFX_BUTTON_CLICK);
 
-void Match::OfferSurrender()
-{
-	cout << "Dealer has an A. Do you wish to surrender? (Y / N)" << endl;
-	char option{};
+					if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetUp.image))
+					{
+						if (player.ValidateBet(bets[0] + betIncrement))
+						{
+							bets[0] += betIncrement;
+							roundCredits = player.GetCredits() - bets[0];
+						}
+						else
+						{	
+							txtMessage.value = "Not enough credits";
+						}
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetDown.image))
+					{
+						if (bets[0] - betIncrement >= initialBet)
+						{
+							bets[0] -= betIncrement;
+							roundCredits = player.GetCredits() - bets[0];
+						}
+						else
+						{
+							txtMessage.value = "Minimum bet is $10";
+						}
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetConfirm.image))
+					{
+						GameRender::PlaySFX(btnBetConfirm.sfxSrc);
+						txtMessage.value = "";
+						betting = false;
+						break;
+					}
+					else
+					{
+						break;
+					}
 
-	while (cin >> option)
-	{
-		if (option == 'Y' || option == 'y')
-		{
-			FinishRound(true);
-			return;
-		}
-		else if (option == 'N' || option == 'n')
-		{
-			ApplyInsurance();
-			return;
-		}
-		else
-		{
-			cout << "Option invalid. Please enter a valid choice." << endl;
-			Common::FlushInput();
+					RedrawTable();
+					break;
+				}
+			}
 		}
 	}
 }
@@ -182,40 +465,33 @@ void Match::ApplyInsurance()
 	{
 		insuranceApplied = true;
 		insuranceValue = (int)round(bets[0] / 2);
-		cout << "Insurance automatically applied to your bet. Additional " << bets[0] / 2 << " colleted." << endl;
-		cout << "If dealer has a Blackjack, you'll get " << bets[0] << " back." << endl;
+		txtMessage.value = "Insurance applied to your bet. Additional " + to_string(bets[0] / 2)+ " colleted.";
+		txtMessage.value += "If dealer has a Blackjack, you'll get " + to_string(bets[0]) +  " back.";
 	}
 }
 
 void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 {
-	bool stillPlaying = true;
+	playing = true;
 	
 	// play all hands
-	while (stillPlaying)
+	GetPlay(&beginningRound, player.GetSplitable());
+
+	if (!finishedRound)
+		// check if any of the player's hand still has a wiinning chance	
 	{
 		int i{ 0 };
-		for (bool handActive : player.GetHandsStatus())
+		for (vector<Card> hand : player.GetHands())
 		{
-			stillPlaying = (handActive && stillPlaying);
-			if (handActive)
-			{
-				GetPlay(&beginningRound, player.GetSplitable() , i);
-			}
+			int handResult = CheckPlayerCards(&player, false, i);
+			bool handWon = (handResult == 2 || handResult == 3);
+			*all21 = (all21 && handWon);
+			bool handBusted = (handResult == 1);
+			*allBusted = (allBusted && handBusted);
 			i++;
 		}
-	}
 
-	// check if any of the player's hand still has a wiinning chance	
-	int i{ 0 };
-	for (vector<Card> hand : player.GetHands())
-	{
-		int handResult = CheckPlayerCards(&player, false, i);
-		bool handWon = (handResult == 2 || handResult == 3);
-		*all21 = (all21 && handWon);
-		bool handBusted = (handResult == 1);
-		*allBusted = (allBusted && handBusted);
-		i++;
+		playing = false;
 	}
 }
 
@@ -223,67 +499,141 @@ void Match::LetHousePlay()
 {
 	dealerPlayed = true;
 	dealer.ShowHiddenCards();
-	dealer.ViewSingleHand();
+
+	RedrawTable();
+
 	while (dealer.GetHandScore() < 17)
 	{
 		Hit(&dealer);
 	}
 }
 
-void Match::GetPlay(bool* beginningRound, bool splitable, int hand)
-{
-	// get the player's choice of play
-	cout << "Please enter an option" << (player.GetHands().size() > 1 ? " for Hand " + to_string(hand + 1) + ":" : ":") << endl;
-	if (*beginningRound) 
-	{
-		if (splitable)
-		{
-			cout << "(P) sPlit" << endl;
-		}
-		cout << "(D) Double down" << endl;
-	}
-	cout << "(H) Hit" << endl; 
-	cout << "(S) Stay" << endl;
+void Match::GetPlay(bool* beginningRound, bool splitable)
+{	
+	GameRender::DrawElement(&btnHit);
+	GameRender::DrawElement(&btnStay);
 
-	char option{ };
-	
-	// direct play to the proper course, ensuring only valid plays are selectable
-	while (cin >> option)
+	if (beginningRound)
 	{
-		if ((option == 'P' || option == 'p') && *beginningRound && splitable)
+		GameRender::DrawElement(&btnDoubleDown, false);
+		if (player.GetSplitable())
 		{
-			Split();
-			break;
+			GameRender::DrawElement(&btnSplit, false);
 		}
-		else if ((option == 'D' || option == 'd') && *beginningRound)
+		if (dealer.GetHandRisk())
 		{
-			DoubleDown();
-			break;
-		}
-		else if (option == 'H' || option == 'h')
-		{
-			Hit(&player, hand);
-			break;
-		}
-		else if (option == 'S' || option == 's')
-		{
-			player.Stay(hand);
-			break;
-		}
-		else
-		{
-			cout << "Option invalid. Please enter a valid play." << endl;
-			Common::FlushInput();
+			GameRender::DrawElement(&btnSurrender, false);
+			GameRender::DrawElement(&btnInsurance, false);
 		}
 	}
-	*beginningRound = false;
+
+	bool listening = true;
+	while (listening)
+	{
+		while (SDL_PollEvent(&matchEvent))
+		{
+			switch (matchEvent.type)
+			{
+				// Check if user tries to quit the window
+				case SDL_QUIT:
+				{
+					// Break out of loop to end game
+					listening = false;
+					exit(0);
+					break;
+				}
+				//	Check if the ESC key was pressed
+				case SDL_KEYDOWN:
+				{
+					//	Check if 'ESC' was pressed
+					if (matchEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+					{
+						// Break out of loop to end game
+						listening = false;
+						exit(0);
+					}
+					break;
+				}
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					GameRender::PlaySFX(SFX_BUTTON_CLICK);
+
+					if ((CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit.tooltip)) && player.GetFirstHandStatus())
+					{
+						GameRender::PlaySFX(btnHit.sfxSrc);
+						txtMessage.value = "";
+						Hit(&player, 0);
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay.tooltip) && player.GetFirstHandStatus())
+					{
+						txtMessage.value = "";
+						player.Stay(0);
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnDoubleDown.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnDoubleDown.tooltip) && player.GetFirstHandStatus())
+					{
+						GameRender::PlaySFX(btnDoubleDown.sfxSrc);
+						txtMessage.value = "";
+						DoubleDown();
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnSplit.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnSplit.tooltip) && player.GetFirstHandStatus())
+					{
+						GameRender::PlaySFX(btnSplit.sfxSrc);
+						txtMessage.value = "";
+						Split();
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnSurrender.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnSurrender.tooltip) && player.GetFirstHandStatus())
+					{
+						txtMessage.value = "";
+						listening = false;
+						*beginningRound = false;
+						playing = false;
+						finishedRound = true;
+						FinishRound(true);
+						break;
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnInsurance.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnInsurance.tooltip) && player.GetFirstHandStatus())
+					{
+						txtMessage.value = "";
+						ApplyInsurance();
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit2.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit2.tooltip) && player.GetSecondHandStatus())
+					{
+						GameRender::PlaySFX(btnHit2.sfxSrc);
+						txtMessage.value = "";
+						Hit(&player, 1);
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay2.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay2.tooltip) && player.GetSecondHandStatus())
+					{
+						txtMessage.value = "";
+						player.Stay(1);
+					}
+					else
+					{
+						break;
+					}
+
+					if (beginningRound || txtMessage.value != "")
+					{
+						RedrawTable();
+					}
+
+					if (player.GetFirstHandStatus() == false && player.GetSecondHandStatus() == false)
+					{
+						listening = false;
+					}
+
+					break;
+				}
+			}
+			*beginningRound = false;
+		}
+	}
 }
 
 void Match::Hit(Player* currentPlayer, int hand)
 {
 	dealer.DealCard(DrawCard(), currentPlayer, hand);
 	CalculatePlayerScore(currentPlayer, hand);
-	ViewPlayerGame(currentPlayer, true, hand);
 	CheckPlayerCards(currentPlayer, false, hand);
 }
 
@@ -294,20 +644,19 @@ void Match::Split()
 		bets[0] *= 2;
 		bets.push_back(bets[0]);
 		roundCredits = player.GetCredits() - (bets[0] * 2);
-		cout << "Now betting $" << bets[0] << " on each hand" << endl;
+		txtMessage.value ="Now betting $" + to_string(bets[0]) + " on each hand";
 		player.Split();
+
+		int i{ 0 };
+		for (vector<Card> hand : player.GetHands())
+		{
+			Hit(&player, i);
+			i++;
+		}
 	}
 	else
 	{
-		cout << "Insuficient credits to split. Please choose another play." << endl;
-		GetPlay(&beginningRound, player.GetSplitable(), 0);
-	}
-
-	int i{0};
-	for (vector<Card> hand : player.GetHands())
-	{
-		Hit(&player, i);
-		i++;
+		txtMessage.value =  "Insuficient credits to split. Please choose another play.";
 	}
 }
 
@@ -316,32 +665,33 @@ void Match::DoubleDown()
 	if (player.ValidateBet(bets[0], 2))
 	{
 		bets[0] *= 2;
-		cout << "Bet of $" << bets[0] / 2 << " doubled. Current bet is $" << bets[0] << endl;
+		txtMessage.value = "Bet of $" + to_string(bets[0] / 2) + " doubled. Current bet is $" + to_string(bets[0]);
 		Hit(&player);
 		player.Stay();
 	}
 	else
 	{
-		cout << "Insuficient credits to double. Please choose another play." << endl;
-		GetPlay(&beginningRound, player.GetSplitable(), 0);
+		txtMessage.value = "Insuficient credits to double. Please choose another play.";
 	}
 }
 
 void Match::FinishRound(bool surrender)
 {
-	cout << "------------ Finishing Round ---------------" << endl;
 	if (!surrender)
 	{
-		cout << "--------- House ---------" << endl;
-		dealer.ShowHiddenCards();
-		ViewPlayerGame(&dealer, ((dealerPlayed || CheckPlayerCards(&dealer, &beginningRound) == 2) ? true : false));
+		Sleep(1500);
+		if (dealerPlayed && !dealer.GetCard(0, 0)->GetFaceUp())
+		{
+			dealer.ShowHiddenCards();
+			RedrawTable();
+		}
 
-		cout << "---------- You ----------" << endl;
+		txtMessage.value = "";
+
 		int i{ 0 };
 		int dealerRoundResult = dealer.GetHandScore();
 		for (vector<Card> hand : player.GetHands())
 		{
-			ViewPlayerGame(&player, true, i);
 			int handRoundResult = player.GetHandScore(i);
 			int handSize = player.GetSingleHand(i).size();
 			int handResultCheck{ 0 };
@@ -379,7 +729,6 @@ void Match::FinishRound(bool surrender)
 			}
 			PayBet(handResultCheck, i);
 			i++;
-			cout << "-------------------------" << endl;
 		}
 		if (insuranceApplied)
 		{
@@ -391,22 +740,26 @@ void Match::FinishRound(bool surrender)
 		PayBet(7);
 	}
 
+	RedrawTable();
+
 	// reset round controls
-	roundCredits = 0;
 	bets = *(new vector<int>(1));
 	for (Player* currentPlayer : players)
 	{
 		currentPlayer->FinishRound();
 	}
+	betting = true;
 	dealerPlayed = false;
 	finishedRound = true;
 	insuranceApplied = false;
+	txtMessage.value = "";
+
+	Sleep(2000);
 }
 
 void Match::FinishGame()
 {
 	gameStatus = over;
-	cout << "Thanks for playing!" << endl;
 }
 
 void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
@@ -427,7 +780,6 @@ void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
 		}
 		i++;
 	}
-
 
 	// if the accumulated Aces would bust the player's hand, count them as 1
 	if (handScore + aces * 11 > 21)
@@ -476,17 +828,6 @@ int Match::CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand
 	}
 }
 
-void Match::ViewPlayerGame(Player* currentPlayer, bool showScore, int hand)
-{
-	currentPlayer->GetHands().size() > 1 ? currentPlayer->ViewSingleHand(hand, true) : currentPlayer->ViewSingleHand(hand);
-	
-	if (showScore)
-	{
-		cout << "Hand total: " << currentPlayer->GetHandScore(hand) << endl;
-	}
-	cout << "-------------------------" << endl;
-}
-
 void Match::PayBet(int playerResult, int hand)
 {
 	switch (playerResult)
@@ -494,57 +835,74 @@ void Match::PayBet(int playerResult, int hand)
 		case 0: // player busted
 		case 5: // dealer closer to 21
 		{
-			cout << "Collecting $" << bets[hand] << endl;
+			GameRender::PlaySFX(SFX_PAY_BET);
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value +=  "Hand " + to_string(hand + 1) + ">> Dealer wins. Collecting $" + to_string(bets[hand]);
 			player.AdjustCredits(-bets[hand]);
-			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break; 
 		}
 		case 2: // player's blackjack
 		{
+			GameRender::PlaySFX(SFX_RECEIVE_BET);
 			int pay{ (int)round(bets[hand] * 1.5) };
-			cout << "Receiving $" << abs(pay) << endl;
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value += "Hand " + to_string(hand + 1) + ">> Player wins. Receiving $" + to_string(abs(pay));
 			player.AdjustCredits(pay);
-			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break; 
 		}
 		case 1: // dealer busted
 		case 3: // player's long 21
 		case 4: // player closer to 21
 		{
+			GameRender::PlaySFX(SFX_RECEIVE_BET);
 			int pay{ (int)round(bets[hand] * 2.5) };
-			cout << "Receiving $" << abs(pay) << endl;
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value += "Hand " + to_string(hand + 1) + ">> Player wins. Receiving $" + to_string(abs(pay));
 			player.AdjustCredits(pay);
-			cout << "Current Credits: $" << player.GetCredits() << endl; 
 			break;
 		}
 		case 6: // tie
 		{
-			cout << "Tie. No credits collected or received." << endl;
-			cout << "Current Credits: $" << player.GetCredits() << endl;
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value += "Hand " + to_string(hand + 1) + ">> Tie. No credits collected or received";
 			break;
 		}
 		case 7: // surrender
 		{
+			GameRender::PlaySFX(SFX_RECEIVE_BET);
 			int pay{ -(int)round(bets[0] / 2) };
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value += "Hand " + to_string(hand + 1) + ">> Receiving $" + to_string(abs(pay)) + " back ";
 			player.AdjustCredits(pay);
-			cout << "Receiving $" << abs(pay) << " back" << endl;
-			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break;
-		}
-		case 8: // insurance applied & dealer got BlackJack
-		{	
-			int pay{ (int)(insuranceValue * 2)  };
-			player.AdjustCredits(pay);
-			cout << "Receiving $" << abs(pay) << " from insurance" << endl;
-			cout << "Current Credits: $" << player.GetCredits() << endl;
-			break; 
 		}
 		case 9: // insurance applied and dealer didn't get a Blackjack
 		{
 			int pay{ (int)-insuranceValue };
 			player.AdjustCredits(pay);
-			cout << "Collecting $" << abs(pay) << " from insurance" << endl;
-			cout << "Current Credits: $" << player.GetCredits() << endl;
+			txtMessage.value += "\n Collecting $" + to_string(abs(pay)) + " from insurance";
+			break;
+		}
+		case 8: // insurance applied & dealer got BlackJack
+		{
+			int pay{ (int)(insuranceValue * 2) };
+			txtMessage.value += "\n Receiving $" + to_string(abs(pay)) + " from insurance";
+			player.AdjustCredits(pay);
 			break;
 		}
 		case 100: // error

@@ -38,5 +38,5 @@ bool Human::GetSplitable()
 
 void Human::DetermineSplitable()
 {
-	splitableHand = hands[0][0].GetFace() == hands[0][1].GetFace();
+	splitableHand = (hands[0][0].GetFace() == hands[0][1].GetFace() && hands[0].size() == 2);
 }
