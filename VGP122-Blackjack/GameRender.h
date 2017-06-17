@@ -37,7 +37,7 @@ public:
 
 	static void PrintText(Textbox* textbox, bool save = false);
 
-	static void PlaySound(string sfxPath, int loops = 0);
+	static void PlaySFX(string sfxPath, int loops = 0);
 
 	static void ClearScreen(bool keepSavedItems = false);
 

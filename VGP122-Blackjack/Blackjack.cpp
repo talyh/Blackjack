@@ -108,7 +108,7 @@ void ListenForGameEvents(bool listening)
 				}
 				case SDL_MOUSEBUTTONDOWN:
 				{
-					GameRender::PlaySound(SFX_BUTTON_CLICK);
+					GameRender::PlaySFX(SFX_BUTTON_CLICK);
 
 					if (CollisionDetection::isColliding(startMenuEvent.motion.x, startMenuEvent.motion.y, btnStart.image))
 					{

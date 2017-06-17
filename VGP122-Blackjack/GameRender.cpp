@@ -261,18 +261,19 @@ void GameRender::PrintText(Textbox* textbox, bool save)
 	}
 }
 
-void GameRender::PlaySound(string sfxPath, int loops)
+void GameRender::PlaySFX(string sfxPath, int loops)
 {
 	// create a new chunk with the sound provided
 	Mix_Chunk *sfx = NULL;
 	sfx = Mix_LoadWAV(sfxPath.c_str());
 	if (!sfx)
 	{
-		cerr << "Mix_LoadWAV Error: " << Mix_GetError() << endl;
+		cerr << "Mix_LoadWAV Error: " << Mix_GetError() << " " << sfxPath << endl;
+		exit(1);
 	}
 	else
 	{
-		//cout << "Playing sound " << sfxPath << endl;
+		cout << "Playing sound " << sfxPath << endl;
 	}
 
 	// play sound

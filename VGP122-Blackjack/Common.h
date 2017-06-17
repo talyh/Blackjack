@@ -32,7 +32,7 @@ const int PADDING { 20 };
 const Size START_MENU_BUTTON_SIZE { 383, 78 };
 const Size BET_BUTTON_SIZE { 32, 32 }; 
 const Size PLAY_BUTTON_SIZE { 32, 32 };
-const int BUTTON_PADDING { 8 };
+const int BUTTON_PADDING { 12 };
 const int CARD_PADDING{ 15 };
 const Position DEALER_HAND_POSITION{ SCREEN_WIDTH / 2 - CARD_WIDTH, PADDING };
 const Position PLAYER_HAND_POSITION{ SCREEN_WIDTH / 2 - CARD_WIDTH, SCREEN_HEIGHT - CARD_HEIGHT - PADDING * 8 };
@@ -62,16 +62,14 @@ const string CARDS_IMAGE = "imgs/cards.png";
 const string CARD_BACK_IMAGE = "imgs/cardBack.png";
 // audio
 const string MUSIC = "snds/music.mid";
-const string SFX_BUTTON_CLICK = "snds/jump.wav";
-const string SFX_START = "snds/";
-const string SFX_BET = "sdns/";
-const string SFX_HIT = "sdns/";
-const string SFX_STAY = "sdns/";
-const string SFX_SPLIT = "sdns/";
-const string SFX_DOUBLE_DOWN = "sdns/";
-const string SFX_RECEIVE_BET = "sdns/";
-const string SFX_PAY_BET = "sdns/";
-const string SFX_GAME_OVER = "sdns/";
+const string SFX_BUTTON_CLICK = "snds/click.wav";
+const string SFX_BET = "snds/bet.wav";
+const string SFX_HIT = "snds/split.wav";
+const string SFX_SPLIT = "snds/split.wav";
+const string SFX_DOUBLE_DOWN = "snds/split.wav";
+const string SFX_RECEIVE_BET = "snds/receive.wav";
+const string SFX_PAY_BET = "snds/pay.wav";
+
 // font
 const string FONT = "fnts/amer_typewriter.ttf";
 const int FONT_SIZE { 28 };
