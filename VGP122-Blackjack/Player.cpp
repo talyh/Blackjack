@@ -21,7 +21,21 @@ void Player::ReceiveCard(Card card, int hand)
 
 	AdditionalTasksOnReceiveCard();
 
-	GameRender::DrawElement(&hands[hand][hands[hand].size() - 1], (type == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * hands[hand].size()));
+	if (type == "dealer")
+	{
+		GameRender::DrawElement(&hands[hand][hands[hand].size() - 1], DEALER_HAND_POSITION + CARD_PADDING * hands[hand].size());
+	}
+	else
+	{
+		if (hand == 0)
+		{
+			GameRender::DrawElement(&hands[hand][hands[hand].size() - 1], PLAYER_HAND_POSITION + CARD_PADDING * hands[hand].size());
+		}
+		else
+		{
+			GameRender::DrawElement(&hands[hand][hands[hand].size() - 1], PLAYER_HAND2_POSITION + CARD_PADDING * hands[hand].size());
+		}
+	}
 }
 
 void Player::Stay(int hand)

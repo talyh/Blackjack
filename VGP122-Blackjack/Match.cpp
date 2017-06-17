@@ -98,8 +98,8 @@ Button btnStay {
 Button btnHit2{
 	"btnHit",
 	{
-		SCREEN_WIDTH - PADDING,
-		SCREEN_HEIGHT / 2
+		SCREEN_WIDTH - PADDING * 4 - PLAY_BUTTON_SIZE.width,
+		btnHit.position.yPos
 	},
 	PLAY_BUTTON_SIZE,
 	BTN_HIT_IMAGE,
@@ -320,14 +320,30 @@ void Match::RedrawTable()
 	
 	for (Player* player : players)
 	{
+		int i { 0 };
 		for (vector<Card> hand : player->GetHands())
 		{
-			int i{ 1 };
+			int j { 1 };
 			for (Card card : hand)
 			{
-				GameRender::DrawElement(&card, (player->GetType() == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * i));
-				i++;
+				if (player->GetType() == "dealer")
+				{
+					GameRender::DrawElement(&card, DEALER_HAND_POSITION + (CARD_PADDING * j));
+				}
+				else
+				{
+					if (i == 0)
+					{
+						GameRender::DrawElement(&card, PLAYER_HAND_POSITION + (CARD_PADDING * j));
+					}
+					else
+					{
+						GameRender::DrawElement(&card, PLAYER_HAND2_POSITION + (CARD_PADDING * j));
+					}
+				}
+				j++;
 			}
+			i++;
 		}
 	}
 
@@ -580,13 +596,13 @@ void Match::GetPlay(bool* beginningRound, bool splitable)
 						txtMessage.value = "";
 						ApplyInsurance();
 					}
-					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit2.image) && player.GetSecondHandStatus())
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit2.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit2.tooltip) && player.GetSecondHandStatus())
 					{
 						GameRender::PlaySFX(btnHit2.sfxSrc);
 						txtMessage.value = "";
 						Hit(&player, 1);
 					}
-					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay2.image) && player.GetSecondHandStatus())
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay2.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay2.tooltip) && player.GetSecondHandStatus())
 					{
 						txtMessage.value = "";
 						player.Stay(1);
@@ -601,7 +617,10 @@ void Match::GetPlay(bool* beginningRound, bool splitable)
 						RedrawTable();
 					}
 
-					listening = (player.GetFirstHandStatus() && player.GetSecondHandStatus());
+					if (player.GetFirstHandStatus() == false && player.GetSecondHandStatus() == false)
+					{
+						listening = false;
+					}
 
 					break;
 				}
@@ -666,18 +685,13 @@ void Match::FinishRound(bool surrender)
 			dealer.ShowHiddenCards();
 			RedrawTable();
 		}
-		
-		/* --------------------- DEBUG ------------------------*/
-		cout << "Dealer's Hand" << endl;
-		dealer.ViewSingleHand();
-		cout << "Score: " << dealer.GetHandScore() << endl;
-		/* --------------------------------------------------- */
+
+		txtMessage.value = "";
 
 		int i{ 0 };
 		int dealerRoundResult = dealer.GetHandScore();
 		for (vector<Card> hand : player.GetHands())
 		{
-			//ViewPlayerGame(&player, true, i);
 			int handRoundResult = player.GetHandScore(i);
 			int handSize = player.GetSingleHand(i).size();
 			int handResultCheck{ 0 };
@@ -822,7 +836,11 @@ void Match::PayBet(int playerResult, int hand)
 		case 5: // dealer closer to 21
 		{
 			GameRender::PlaySFX(SFX_PAY_BET);
-			txtMessage.value =  "Dealer wins. Collecting $" + to_string(bets[hand]);
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value +=  "Hand " + to_string(hand + 1) + ">> Dealer wins. Collecting $" + to_string(bets[hand]);
 			player.AdjustCredits(-bets[hand]);
 			break; 
 		}
@@ -830,7 +848,11 @@ void Match::PayBet(int playerResult, int hand)
 		{
 			GameRender::PlaySFX(SFX_RECEIVE_BET);
 			int pay{ (int)round(bets[hand] * 1.5) };
-			txtMessage.value =  "Player wins. Receiving $" + to_string(abs(pay));
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value += "Hand " + to_string(hand + 1) + ">> Player wins. Receiving $" + to_string(abs(pay));
 			player.AdjustCredits(pay);
 			break; 
 		}
@@ -840,20 +862,32 @@ void Match::PayBet(int playerResult, int hand)
 		{
 			GameRender::PlaySFX(SFX_RECEIVE_BET);
 			int pay{ (int)round(bets[hand] * 2.5) };
-			txtMessage.value = "Player wins. Receiving $" + to_string(abs(pay));
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value += "Hand " + to_string(hand + 1) + ">> Player wins. Receiving $" + to_string(abs(pay));
 			player.AdjustCredits(pay);
 			break;
 		}
 		case 6: // tie
 		{
-			txtMessage.value = "Tie. No credits collected or received";
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value += "Hand " + to_string(hand + 1) + ">> Tie. No credits collected or received";
 			break;
 		}
 		case 7: // surrender
 		{
 			GameRender::PlaySFX(SFX_RECEIVE_BET);
 			int pay{ -(int)round(bets[0] / 2) };
-			txtMessage.value = "Receiving $" + to_string(abs(pay)) + " back ";
+			if (txtMessage.value != "")
+			{
+				txtMessage.value += "\n ";
+			}
+			txtMessage.value += "Hand " + to_string(hand + 1) + ">> Receiving $" + to_string(abs(pay)) + " back ";
 			player.AdjustCredits(pay);
 			break;
 		}
