@@ -1,7 +1,3 @@
-﻿  Match.cpp
-h:\vgp122-blackjack\vgp122-blackjack\match.cpp(352): warning C4018: '<': signed/unsigned mismatch
-h:\vgp122-blackjack\vgp122-blackjack\match.cpp(377): warning C4018: '>=': signed/unsigned mismatch
-h:\vgp122-blackjack\vgp122-blackjack\match.cpp(482): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
-h:\vgp122-blackjack\vgp122-blackjack\match.cpp(552): warning C4018: '>=': signed/unsigned mismatch
+﻿  Blackjack.cpp
   VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.exe
   VGP122-Blackjack.vcxproj -> H:\VGP122-Blackjack\Debug\VGP122-Blackjack.pdb (Partial PDB)

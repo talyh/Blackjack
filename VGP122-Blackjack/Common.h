@@ -35,12 +35,7 @@ const Size PLAY_BUTTON_SIZE { 32, 32 };
 const int BUTTON_PADDING { 8 };
 const int CARD_PADDING{ 15 };
 const Position DEALER_HAND_POSITION{ SCREEN_WIDTH / 2 - CARD_WIDTH, PADDING };
-const Position PLAYER_HAND_POSITION{ SCREEN_WIDTH / 2 - CARD_WIDTH, SCREEN_HEIGHT - CARD_HEIGHT - PADDING * 4 };
-
-// protoype functions
-void ListenForGameEvents(bool listening);
-void LoadStartMenu();
-void ShowInstructions();
+const Position PLAYER_HAND_POSITION{ SCREEN_WIDTH / 2 - CARD_WIDTH, SCREEN_HEIGHT - CARD_HEIGHT - PADDING * 8 };
 
 // define constants
 // visual
@@ -80,16 +75,6 @@ const string SFX_GAME_OVER = "sdns/";
 // font
 const string FONT = "fnts/amer_typewriter.ttf";
 const int FONT_SIZE { 28 };
-
-class Common
-{
-public:
-	static void FlushInput()
-	{
-		/*cin.clear();
-		cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');*/
-	}
-};
 
 #endif
 

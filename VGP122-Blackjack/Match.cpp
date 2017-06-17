@@ -1,9 +1,5 @@
 #include "Match.h"
 
-// initialize timer variables
-int				deltaT = 75;	// defines delay in time for updating game loop
-int				updatedTime = 0;	// used to determine if frame rate interval has elapsed
-
 // initialize Event Variables
 SDL_Event matchEvent;
 
@@ -14,7 +10,8 @@ const Size AVATAR_SIZE{ 72, 72 };
 const string AVATAR_IMAGE = "imgs/avatar.png";
 const Position AVATAR_POSITION { 
 	PADDING , 
-	SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING 
+	//SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING 
+	PADDING
 };
 
 // credits
@@ -24,7 +21,7 @@ Textbox lblCredits {
 	AVATAR_POSITION.yPos, 
 	0, 
 	0, 
-	"Credits: " 
+	"Credits: $" 
 };
 Textbox txtCredits { "txtCredits" };
 
@@ -33,7 +30,7 @@ const int LBL_BET_INITIAL_WIDTH = 50;
 Textbox lblBet {
 	"lblBet",
 	SCREEN_WIDTH / 6 - LBL_BET_INITIAL_WIDTH,
-	SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING * 5,
+	SCREEN_HEIGHT - AVATAR_SIZE.height - PADDING * 8,
 	0,
 	0,
 	"Bet: "
@@ -43,7 +40,7 @@ Button btnBetUp {
 	"btnBetUp",
 	{
 		SCREEN_WIDTH / 6 + 50,
-		lblBet.position.yPos - BET_BUTTON_SIZE.height / 2 - 8
+		lblBet.position.yPos - BET_BUTTON_SIZE.height / 2 - BUTTON_PADDING
 	},
 	BET_BUTTON_SIZE,
 	BTN_BET_UP_IMAGE,
@@ -53,7 +50,7 @@ Button btnBetDown {
 	"btnBetDown",
 	{
 		SCREEN_WIDTH / 6 + 50,
-		lblBet.position.yPos + BET_BUTTON_SIZE.height / 2 + 8
+		lblBet.position.yPos + BET_BUTTON_SIZE.height / 2 + BUTTON_PADDING
 	},
 	BET_BUTTON_SIZE,
 	BTN_BET_DOWN_IMAGE,
@@ -62,7 +59,7 @@ Button btnBetDown {
 Button btnBetConfirm {
 	"btnConfirm1",
 	{
-		btnBetUp.position.xPos + BET_BUTTON_SIZE.width + 8,
+		btnBetUp.position.xPos + BET_BUTTON_SIZE.width + BUTTON_PADDING,
 		lblBet.position.yPos + BET_BUTTON_SIZE.height / 2
 	},
 	BET_BUTTON_SIZE,
@@ -73,7 +70,7 @@ Button btnHit {
 	"btnHit",
 	{ 
 		PADDING,
-		SCREEN_HEIGHT / 2
+		SCREEN_HEIGHT / 2 - PADDING * 6
 	},
 	PLAY_BUTTON_SIZE,
 	BTN_HIT_IMAGE,
@@ -167,9 +164,23 @@ Button btnSurrender {
 	BTN_SURRENDER_TOOLTIP,
 	new Sprite(BTN_SURRENDER_TOOLTIP.c_str(), 0, 0, 0, 0, nullptr)
 };
+Button btnYes {
+	"btnYes",
+	{ 0, 0 },
+	PLAY_BUTTON_SIZE,
+	BTN_YES_IMAGE,
+	new Sprite(BTN_YES_IMAGE.c_str(), 0, 0, 0, 0, nullptr)
+};
+Button btnNo {
+	"btnNo",
+	{ 0, 0 },
+	PLAY_BUTTON_SIZE,
+	BTN_NO_IMAGE,
+	new Sprite(BTN_NO_IMAGE.c_str(), 0, 0, 0, 0, nullptr)
+};
 Textbox txtMessage {
 	"txtMessage",
-	PADDING * 10,
+	PADDING,
 	SCREEN_HEIGHT - PADDING * 5,
 	0,
 	0,
@@ -177,6 +188,7 @@ Textbox txtMessage {
 };
 
 bool betting = true;
+bool playing = false;
 
 Match::Match() : gameStatus{ notStarted } 
 { 
@@ -189,24 +201,6 @@ Match::Match() : gameStatus{ notStarted }
 
 	// create space in the bets vector to store the first bet
 	bets.push_back(0);
-
-	// send dynamic items to vector to be cleaned at the end
-	itemsCreated.push_back(btnBetUp.image);
-	itemsCreated.push_back(btnBetUp.tooltip);
-	itemsCreated.push_back(btnBetDown.image);
-	itemsCreated.push_back(btnBetDown.tooltip);
-	itemsCreated.push_back(btnBetConfirm.image);
-	itemsCreated.push_back(btnBetConfirm.tooltip);
-	itemsCreated.push_back(btnHit.image);
-	itemsCreated.push_back(btnHit.tooltip);
-	itemsCreated.push_back(btnStay.image);
-	itemsCreated.push_back(btnStay.tooltip);
-	itemsCreated.push_back(btnDoubleDown.image);
-	itemsCreated.push_back(btnDoubleDown.tooltip);
-	itemsCreated.push_back(btnSplit.image);
-	itemsCreated.push_back(btnSplit.tooltip);
-	itemsCreated.push_back(btnSurrender.image);
-	itemsCreated.push_back(btnSurrender.tooltip);
 }
 
 int Match::GetGameStatus()
@@ -238,17 +232,6 @@ void Match::PlayRound()
 
 	while (!finishedRound)
 	{
-		//GameRender::ClearScreen(true);
-		// show avatar
-		//GameRender::DrawElement(AVATAR_IMAGE, AVATAR_POSITION.xPos, AVATAR_POSITION.yPos, AVATAR_SIZE.width, AVATAR_SIZE.height, &avatar);
-
-		//// show credits
-		//GameRender::PrintText(&lblCredits, true);
-		//txtCredits.value = to_string(player.GetCredits());
-		//txtCredits.position.xPos = lblCredits.position.xPos + lblCredits.size.width + PADDING;
-		//txtCredits.position.yPos = lblCredits.position.yPos,
-		//GameRender::PrintText(&txtCredits);
-
 		// get bet
 		GetBet();
 
@@ -263,9 +246,15 @@ void Match::PlayRound()
 		{
 			CalculatePlayerScore(p);
 		}
+
 		// if any of the players got a natural blackjack, jump to Finish Round
 		if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
 		{
+			txtMessage.value = "21 !";
+			
+			Sleep(1500);
+
+			// finish round
 			FinishRound();
 		}	
 		
@@ -316,20 +305,67 @@ void Match::RedrawTable()
 		GameRender::PrintText(&txtCredits, true);
 	}
 	
-	if (!beginningRound && !finishedRound)
+	if (playing)
+	{
+		if (player.GetSecondHandStatus())
+		{
+			GameRender::DrawElement(&btnHit);
+			GameRender::DrawElement(&btnStay);
+		}
+		
+		if (beginningRound)
+		{
+			GameRender::DrawElement(&btnDoubleDown, false);
+			if (player.GetSplitable())
+			{
+				GameRender::DrawElement(&btnSplit, false);
+			}
+			if (dealer.GetHandRisk())
+			{
+				GameRender::DrawElement(&btnSurrender, false);
+				// TODO - add call to insurance
+			}
+		}
+
+		if (player.GetHands().size() > 1 && player.GetSecondHandStatus())
+		{
+			GameRender::DrawElement(&btnHit2);
+			GameRender::DrawElement(&btnStay2);
+		}
+
+		for (Player* player : players)
+		{
+			for (vector<Card> hand : player->GetHands())
+			{
+				int i{ 1 };
+				for (Card card : hand)
+				{
+					GameRender::DrawElement(&card, (player->GetType() == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * i));
+					i++;
+				}
+			}
+		}
+	}
+
+	if (finishedRound)
 	{
 		for (Player* player : players)
 		{
 			for (vector<Card> hand : player->GetHands())
 			{
-				int i { 1 } ;
+				int i{ 1 };
 				for (Card card : hand)
 				{
-					GameRender::DrawElement(&card, ( player->GetType() == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * i) );
+					GameRender::DrawElement(&card, (player->GetType() == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * i));
 					i++;
 				}
 			}
 		}
+	}
+
+	if (txtMessage.value != "")
+	{
+		GameRender::PrintText(&txtMessage);
 	}
 }
 
@@ -351,8 +387,7 @@ void Match::DealInitialHands()
 	{
 		for (size_t j{ 0 }; j < players[i]->INITIAL_HAND_SIZE; j++)
 		{
-			Card c = DrawCard();
-			dealer.DealCard(c, players[i]);
+			dealer.DealCard(DrawCard(), players[i]);
 		}
 	}
 }
@@ -366,115 +401,100 @@ void Match::GetBet()
 	
 	RedrawTable();
 
-	/*GameRender::ClearScreen(true);
-	GameRender::PrintText(&lblBet, true);
-	GameRender::DrawElement(&btnBetUp);
-	GameRender::DrawElement(&btnBetDown);
-	GameRender::DrawElement(&btnBetConfirm);*/
-
 	while (betting)
-	{
-		if (SDL_GetTicks() - updatedTime >= deltaT)
+	{			
+		while (SDL_PollEvent(&matchEvent))
 		{
-			/*txtBet.position = { lblBet.position.xPos + lblBet.size.width + PADDING , lblBet.position.yPos }; 
-			GameRender::PrintText(&txtCredits);
-			GameRender::PrintText(&txtBet);*/
-			
-			while (SDL_PollEvent(&matchEvent))
+			switch (matchEvent.type)
 			{
-				switch (matchEvent.type)
+				// Check if user tries to quit the window
+				case SDL_QUIT:
 				{
-					// Check if user tries to quit the window
-					case SDL_QUIT:
+					// Break out of loop to end game
+					betting = false;
+					exit(0);
+					break;
+				}
+				//	Check if the ESC key was pressed
+				case SDL_KEYDOWN:
+				{
+					//	Check if 'ESC' was pressed
+					if (matchEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 					{
 						// Break out of loop to end game
 						betting = false;
-						exit(1);
-						break;
+						exit(0);
 					}
-					//	Check if the ESC key was pressed
-					case SDL_KEYDOWN:
-					{
-						//	Check if 'ESC' was pressed
-						if (matchEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-						{
-							// Break out of loop to end game
-							betting = false;
-							exit(1);
-						}
-						break;
-					}
-					case SDL_MOUSEBUTTONDOWN:
-					{
-						GameRender::PlaySound(SFX_BUTTON_CLICK);
+					break;
+				}
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					GameRender::PlaySound(SFX_BUTTON_CLICK);
 
-						if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetUp.image))
+					if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetUp.image))
+					{
+						if (player.ValidateBet(bets[0] + betIncrement))
 						{
-							if (player.ValidateBet(bets[0] + betIncrement))
-							{
-								bets[0] += betIncrement;
-								roundCredits = player.GetCredits() - bets[0];
-							}
-							else
-							{	
-								// print error message
-							}
+							bets[0] += betIncrement;
+							roundCredits = player.GetCredits() - bets[0];
 						}
-						else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetDown.image))
-						{
-							if (bets[0] - betIncrement >= initialBet)
-							{
-								bets[0] -= betIncrement;
-								roundCredits = player.GetCredits() - bets[0];
-							}
-							else
-							{
-								// print error message
-							}
+						else
+						{	
+							// print error message
 						}
-						else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetConfirm.image))
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetDown.image))
+					{
+						if (bets[0] - betIncrement >= initialBet)
 						{
-							betting = false;
+							bets[0] -= betIncrement;
+							roundCredits = player.GetCredits() - bets[0];
 						}
 						else
 						{
-							break;
+							// print error message
 						}
-
-						RedrawTable();
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnBetConfirm.image))
+					{
+						betting = false;
 						break;
 					}
+					else
+					{
+						break;
+					}
+
+					RedrawTable();
+					break;
 				}
 			}
-			// update time
-			updatedTime = SDL_GetTicks();
 		}
 	}
 }
 
 void Match::OfferSurrender()
 {
-	cout << "Dealer has an A. Do you wish to surrender? (Y / N)" << endl;
-	char option{};
+	txtMessage.value = "Dealer has an A. Do you wish to surrender?";
 
-	while (cin >> option)
+	btnYes.position.xPos= txtMessage.position.xPos + txtMessage.position.xPos + BUTTON_PADDING;
+	btnYes.position.yPos = txtMessage.position.yPos - PLAY_BUTTON_SIZE.height / 2;
+	GameRender::DrawElement(&btnYes);
+	btnNo.position.xPos = btnYes.position.xPos;
+	btnNo.position.yPos = btnYes.position.yPos + BUTTON_PADDING;
+	GameRender::DrawElement(&btnNo);
+
+	// listen for events
+	/*if (option == 'Y' || option == 'y')
 	{
-		if (option == 'Y' || option == 'y')
-		{
-			FinishRound(true);
-			return;
-		}
-		else if (option == 'N' || option == 'n')
-		{
-			ApplyInsurance();
-			return;
-		}
-		else
-		{
-			cout << "Option invalid. Please enter a valid choice." << endl;
-			Common::FlushInput();
-		}
+		FinishRound(true);
+		return;
 	}
+	else if (option == 'N' || option == 'n')
+	{
+		ApplyInsurance();
+		return;
+	}*/
 }
 
 void Match::ApplyInsurance()
@@ -490,6 +510,8 @@ void Match::ApplyInsurance()
 
 void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 {
+	playing = true;
+	
 	// play all hands
 	GetPlay(&beginningRound, player.GetSplitable());
 
@@ -505,7 +527,7 @@ void Match::LetPlayerPlay(bool* all21, bool* allBusted)
 		i++;
 	}
 
-
+	playing = false;
 }
 
 void Match::LetHousePlay()
@@ -522,110 +544,85 @@ void Match::LetHousePlay()
 }
 
 void Match::GetPlay(bool* beginningRound, bool splitable)
-{
+{	
+	RedrawTable();
 
-	// show options
-	GameRender::DrawElement(&btnHit);
-	GameRender::DrawElement(&btnStay);
-	if (beginningRound)
-	{
-		GameRender::DrawElement(&btnDoubleDown, false);
-		if (player.GetSplitable())
-		{
-			GameRender::DrawElement(&btnSplit, false);
-		}
-		if (dealer.GetHandRisk())
-		{
-			GameRender::DrawElement(&btnSurrender, false);
-			// TODO - add call to insurance
-		}
-	}
-	if (player.GetHands().size() > 1)
-	{
-		GameRender::DrawElement(&btnHit2);
-		GameRender::DrawElement(&btnStay2);
-	}
-	
 	bool listening = true;
 	while (listening)
 	{
-		if (SDL_GetTicks() - updatedTime >= deltaT)
+		while (SDL_PollEvent(&matchEvent))
 		{
-			while (SDL_PollEvent(&matchEvent))
+			switch (matchEvent.type)
 			{
-				switch (matchEvent.type)
+				// Check if user tries to quit the window
+				case SDL_QUIT:
 				{
-					// Check if user tries to quit the window
-					case SDL_QUIT:
+					// Break out of loop to end game
+					listening = false;
+					exit(0);
+					break;
+				}
+				//	Check if the ESC key was pressed
+				case SDL_KEYDOWN:
+				{
+					//	Check if 'ESC' was pressed
+					if (matchEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 					{
 						// Break out of loop to end game
 						listening = false;
-						exit(1);
-						break;
+						exit(0);
 					}
-					//	Check if the ESC key was pressed
-					case SDL_KEYDOWN:
+					break;
+				}
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					GameRender::PlaySound(SFX_BUTTON_CLICK);
+
+					if ((CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit.tooltip)) && player.GetFirstHandStatus())
 					{
-						//	Check if 'ESC' was pressed
-						if (matchEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-						{
-							// Break out of loop to end game
-							listening = false;
-							exit(1);
-						}
-						break;
+						txtMessage.value = "";
+						Hit(&player, 0);
 					}
-					case SDL_MOUSEBUTTONDOWN:
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay.tooltip) && player.GetFirstHandStatus())
 					{
-						GameRender::PlaySound(SFX_BUTTON_CLICK);
-
-						if ((CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit.tooltip)) && player.GetFirstHandStatus())
-						{
-							Hit(&player, 0);
-						}
-						else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay.tooltip) && player.GetFirstHandStatus())
-						{
-							player.Stay(0);
-						}
-						else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnDoubleDown.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnDoubleDown.tooltip) && player.GetFirstHandStatus())
-						{
-							DoubleDown();
-						}
-						else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnSplit.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnSplit.tooltip) && player.GetFirstHandStatus())
-						{
-							Split();
-						}
-						else
-						{
-							break;
-						}
-
-						if (txtMessage.value != "")
-						{
-							GameRender::PrintText(&txtMessage, true);
-						}
-
-						listening = (player.GetFirstHandStatus() && player.GetSecondHandStatus());
-
-						// adjust disabled button images if needed
-						if (!player.GetFirstHandStatus())
-						{
-							btnHit.image->setVisible(false);
-							btnStay.image->setVisible(false);
-						}
-						if (!player.GetSecondHandStatus())
-						{
-							btnHit2.image->setVisible(false);
-							btnStay2.image->setVisible(false);
-						}
-
-						GameRender::ClearScreen(true);
+						txtMessage.value = "";
+						player.Stay(0);
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnDoubleDown.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnDoubleDown.tooltip) && player.GetFirstHandStatus())
+					{
+						txtMessage.value = "";
+						DoubleDown();
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnSplit.image) || CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnSplit.tooltip) && player.GetFirstHandStatus())
+					{
+						txtMessage.value = "";
+						Split();
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnHit2.image) && player.GetSecondHandStatus())
+					{
+						txtMessage.value = "";
+						Hit(&player, 1);
+					}
+					else if (CollisionDetection::isColliding(matchEvent.motion.x, matchEvent.motion.y, btnStay2.image) && player.GetSecondHandStatus())
+					{
+						txtMessage.value = "";
+						player.Stay(1);
+					}
+					else
+					{
 						break;
 					}
+
+					if (txtMessage.value != "")
+					{
+						RedrawTable();
+					}
+
+					listening = (player.GetFirstHandStatus() && player.GetSecondHandStatus());
+
+					break;
 				}
 			}
-			// update time
-			updatedTime = SDL_GetTicks();
 			*beginningRound = false;
 		}
 	}
@@ -647,18 +644,17 @@ void Match::Split()
 		roundCredits = player.GetCredits() - (bets[0] * 2);
 		txtMessage.value ="Now betting $" + to_string(bets[0]) + " on each hand";
 		player.Split();
+
+		int i{ 0 };
+		for (vector<Card> hand : player.GetHands())
+		{
+			Hit(&player, i);
+			i++;
+		}
 	}
 	else
 	{
 		txtMessage.value =  "Insuficient credits to split. Please choose another play.";
-		//GetPlay(&beginningRound, player.GetSplitable(), 0);
-	}
-
-	int i{0};
-	for (vector<Card> hand : player.GetHands())
-	{
-		Hit(&player, i);
-		i++;
 	}
 }
 
@@ -674,20 +670,16 @@ void Match::DoubleDown()
 	else
 	{
 		txtMessage.value = "Insuficient credits to double. Please choose another play.";
-		//GetPlay(&beginningRound, player.GetSplitable(), 0);
 	}
 }
 
 void Match::FinishRound(bool surrender)
 {
-	cout << "------------ Finishing Round ---------------" << endl;
 	if (!surrender)
 	{
-		cout << "--------- House ---------" << endl;
 		dealer.ShowHiddenCards();
-		//ViewPlayerGame(&dealer, ((dealerPlayed || CheckPlayerCards(&dealer, &beginningRound) == 2) ? true : false));
+		RedrawTable();
 
-		cout << "---------- You ----------" << endl;
 		int i{ 0 };
 		int dealerRoundResult = dealer.GetHandScore();
 		for (vector<Card> hand : player.GetHands())
@@ -730,7 +722,6 @@ void Match::FinishRound(bool surrender)
 			}
 			PayBet(handResultCheck, i);
 			i++;
-			cout << "-------------------------" << endl;
 		}
 		if (insuranceApplied)
 		{
@@ -753,19 +744,12 @@ void Match::FinishRound(bool surrender)
 	dealerPlayed = false;
 	finishedRound = true;
 	insuranceApplied = false;
-
-	// clean items created
-	for (void* item : itemsCreated)
-	{
-		delete item;
-		item = nullptr;
-	}
+	txtMessage.value = "";
 }
 
 void Match::FinishGame()
 {
 	gameStatus = over;
-	cout << "Thanks for playing!" << endl;
 }
 
 void Match::CalculatePlayerScore(Player * currentPlayer, int hand)
@@ -835,17 +819,6 @@ int Match::CheckPlayerCards(Player* currentPlayer, bool beginningRound, int hand
 	}
 }
 
-//void Match::ViewPlayerGame(Player* currentPlayer, bool showScore, int hand)
-//{
-//	currentPlayer->GetHands().size() > 1 ? currentPlayer->ViewSingleHand(hand, true) : currentPlayer->ViewSingleHand(hand);
-//	
-//	if (showScore)
-//	{
-//		cout << "Hand total: " << currentPlayer->GetHandScore(hand) << endl;
-//	}
-//	cout << "-------------------------" << endl;
-//}
-
 void Match::PayBet(int playerResult, int hand)
 {
 	switch (playerResult)
@@ -853,17 +826,15 @@ void Match::PayBet(int playerResult, int hand)
 		case 0: // player busted
 		case 5: // dealer closer to 21
 		{
-			cout << "Collecting $" << bets[hand] << endl;
+			txtMessage.value =  "Collecting $" + to_string(bets[hand]);
 			player.AdjustCredits(-bets[hand]);
-			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break; 
 		}
 		case 2: // player's blackjack
 		{
 			int pay{ (int)round(bets[hand] * 1.5) };
-			cout << "Receiving $" << abs(pay) << endl;
+			txtMessage.value =  "Receiving $" + to_string(abs(pay));
 			player.AdjustCredits(pay);
-			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break; 
 		}
 		case 1: // dealer busted
@@ -871,39 +842,34 @@ void Match::PayBet(int playerResult, int hand)
 		case 4: // player closer to 21
 		{
 			int pay{ (int)round(bets[hand] * 2.5) };
-			cout << "Receiving $" << abs(pay) << endl;
+			txtMessage.value = "Receiving $" + to_string(abs(pay));
 			player.AdjustCredits(pay);
-			cout << "Current Credits: $" << player.GetCredits() << endl; 
 			break;
 		}
 		case 6: // tie
 		{
-			cout << "Tie. No credits collected or received." << endl;
-			cout << "Current Credits: $" << player.GetCredits() << endl;
+			txtMessage.value = "Tie. No credits collected or received";
 			break;
 		}
 		case 7: // surrender
 		{
 			int pay{ -(int)round(bets[0] / 2) };
+			txtMessage.value = "Receiving $" + to_string(abs(pay)) + " back ";
 			player.AdjustCredits(pay);
-			cout << "Receiving $" << abs(pay) << " back" << endl;
-			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break;
 		}
 		case 8: // insurance applied & dealer got BlackJack
 		{	
-			int pay{ (int)(insuranceValue * 2)  };
+			int pay{ (int)(insuranceValue * 2) };
+			txtMessage.value = "Receiving $" + to_string(abs(pay)) + " from insurance";
 			player.AdjustCredits(pay);
-			cout << "Receiving $" << abs(pay) << " from insurance" << endl;
-			cout << "Current Credits: $" << player.GetCredits() << endl;
 			break; 
 		}
 		case 9: // insurance applied and dealer didn't get a Blackjack
 		{
 			int pay{ (int)-insuranceValue };
 			player.AdjustCredits(pay);
-			cout << "Collecting $" << abs(pay) << " from insurance" << endl;
-			cout << "Current Credits: $" << player.GetCredits() << endl;
+			txtMessage.value = "Collecting $" + to_string(abs(pay)) + " from insurance";
 			break;
 		}
 		case 100: // error
@@ -913,6 +879,9 @@ void Match::PayBet(int playerResult, int hand)
 			break; 
 		}
 	}
+
+	txtCredits.value = to_string(player.GetCredits());
+	RedrawTable();
 }
 
 int Match::DecideAValue(int baseScore)

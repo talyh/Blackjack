@@ -56,8 +56,6 @@ public:
 			// returns 2 for Natural Blackjack
 			// returns 3 for 21 points
 
-	//void ViewPlayerGame(Player* currentPlayer, bool showScore = true, int hand = 0);
-
 	void PayBet(int playerResult, int hand = 0);
 
 	int DecideAValue(int baseScore); // determines whether A should be counted as 1 or 11 and returns that value
@@ -66,7 +64,7 @@ public:
 	
 	static const int numberOfPlayers{ 2 };
 
-	const int initialBet { 10 };
+	const int initialBet { 490 };
 	const int betIncrement { 10 };
 
 private:	
@@ -87,8 +85,6 @@ private:
 	bool finishedRound; // to determine whether the round is stll ongoing
 	bool insuranceApplied; // to indicate whether the player has insurance for that round
 	int insuranceValue; // to store the value of the insurance
-	
-	vector <void*> itemsCreated;
 };
 
 #endif

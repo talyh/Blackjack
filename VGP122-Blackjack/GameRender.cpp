@@ -198,9 +198,6 @@ void GameRender::DrawElement(Button* button, bool save)
 		button->tooltip->setVisible(false);
 		DrawElement(button->tooltipSrc, button->position.xPos + button->size.width + BUTTON_PADDING, button->position.yPos + button->size.height / 2, button->tooltipSize.width, button->tooltipSize.height, &(button->tooltip), save, button->name + "Tooltip");
 	}
-
-	itemsCreated.push_back(button->image);
-	itemsCreated.push_back(button->tooltip);
 }
 
 void GameRender::DrawElement(Card* card, Position position)

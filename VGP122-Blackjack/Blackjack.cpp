@@ -3,13 +3,50 @@
 #include "GameRender.h"
 #include "CollisionDetection.h"
 
-// declare Pointers we'll need
-Sprite* btnStart = NULL;
-Sprite* btnInstructions = NULL;
-Sprite* btnQuit = NULL;
+// declare buttons we'll need
+Button btnStart
+{
+	"btnStart",
+	{
+		SCREEN_WIDTH / 2 - START_MENU_BUTTON_SIZE.width / 2,
+		100
+	},
+	{
+		START_MENU_BUTTON_SIZE.width,
+		START_MENU_BUTTON_SIZE.height
+	},
+	BTN_PLAY_IMAGE
+};
+
+Button btnInstructions
+{
+	"btnInstructions",
+	{ 0, 0 },
+	{
+		START_MENU_BUTTON_SIZE.width,
+		START_MENU_BUTTON_SIZE.height
+	},
+	BTN_INSTRUCTIONS_IMAGE
+};
+Button btnQuit
+{
+	"btnQuit",
+	{0, 0 },
+	{
+		START_MENU_BUTTON_SIZE.width,
+		START_MENU_BUTTON_SIZE.height
+	},
+	BTN_QUIT_IMAGE
+};
 
 // initialize Event Variables
 SDL_Event startMenuEvent;
+
+// prototype functions
+void LoadStartMenu();
+void ListenForGameEvents(bool listening);
+void ShowInstructions();
+void LoadGameOver();
 
 Match match;
 
@@ -36,8 +73,7 @@ int main(int argc, char** argv)
 	// start listening for user interactions
 	ListenForGameEvents(&gameRunning);
 
-	// unload graphical and visual elements
-	GameRender::Finish();
+	LoadGameOver();
 
 	return 0;
 }
@@ -55,6 +91,7 @@ void ListenForGameEvents(bool listening)
 				{
 					// Break out of loop to end game
 					listening = false;
+					match.FinishGame();
 					break;
 				}
 				//	Check if the ESC key was pressed
@@ -65,6 +102,7 @@ void ListenForGameEvents(bool listening)
 					{
 						// Break out of loop to end game
 						listening = false;
+						match.FinishGame();
 					}
 					break;
 				}
@@ -72,20 +110,20 @@ void ListenForGameEvents(bool listening)
 				{
 					GameRender::PlaySound(SFX_BUTTON_CLICK);
 
-					if (btnStart && CollisionDetection::isColliding(startMenuEvent.motion.x, startMenuEvent.motion.y, btnStart))
+					if (CollisionDetection::isColliding(startMenuEvent.motion.x, startMenuEvent.motion.y, btnStart.image))
 					{
-						cout << "Starting Game" << endl;
 						match.PlayGame();
+						listening = false;
+						break;
 					}
-					else if (btnInstructions && CollisionDetection::isColliding(startMenuEvent.motion.x, startMenuEvent.motion.y, btnInstructions))
+					else if (CollisionDetection::isColliding(startMenuEvent.motion.x, startMenuEvent.motion.y, btnInstructions.image))
 					{
-						cout << "Showing Instructions" << endl;
-						GameRender::ClearScreen();
 						ShowInstructions();
 					}
-					else if (btnQuit && CollisionDetection::isColliding(startMenuEvent.motion.x, startMenuEvent.motion.y, btnQuit))
+					else if (CollisionDetection::isColliding(startMenuEvent.motion.x, startMenuEvent.motion.y, btnQuit.image))
 					{
 						listening = false;
+						match.FinishGame();
 					}
 					break;
 				}
@@ -96,21 +134,57 @@ void ListenForGameEvents(bool listening)
 
 void LoadStartMenu()
 {
-	GameRender::DrawElement(BTN_PLAY_IMAGE, SCREEN_WIDTH / 2 - START_MENU_BUTTON_SIZE.width / 2
-		, 100, START_MENU_BUTTON_SIZE.width, START_MENU_BUTTON_SIZE.height, &btnStart);
-	GameRender::DrawElement(BTN_INSTRUCTIONS_IMAGE, SCREEN_WIDTH / 2 - START_MENU_BUTTON_SIZE.width / 2, btnStart->getYPos() + START_MENU_BUTTON_SIZE.height + LINE_HEIGHT, START_MENU_BUTTON_SIZE.width, START_MENU_BUTTON_SIZE.height, &btnInstructions);
-	GameRender::DrawElement(BTN_QUIT_IMAGE, SCREEN_WIDTH / 2 - START_MENU_BUTTON_SIZE.width / 2, btnInstructions->getYPos() + START_MENU_BUTTON_SIZE.height + LINE_HEIGHT, START_MENU_BUTTON_SIZE.width, START_MENU_BUTTON_SIZE.height, &btnQuit);
+	GameRender::DrawElement(&btnStart);
+	btnInstructions.position = {
+		SCREEN_WIDTH / 2 - START_MENU_BUTTON_SIZE.width / 2,
+		(btnStart.image)->getYPos() + START_MENU_BUTTON_SIZE.height + LINE_HEIGHT
+	};
+	GameRender::DrawElement(&btnInstructions);
+	btnQuit.position = {
+		SCREEN_WIDTH / 2 - START_MENU_BUTTON_SIZE.width / 2,
+		(btnInstructions.image)->getYPos() + START_MENU_BUTTON_SIZE.height + LINE_HEIGHT
+	};
+	GameRender::DrawElement(&btnQuit);
 }
 
 void ShowInstructions()
 {
+	GameRender::ClearScreen();
+	
 	// show text
-	//GameRender::PrintText("Instructions for Blackjack", 10, 100, { 211, 204, 188 });
-	//GameRender::PrintText("Please visit Wikipedia for rules \nhttps://en.wikipedia.org/wiki/Blackjack", 10, 160, {189, 211, 188});
+	Textbox txtInstructions
+	{
+		"txtInstructions",
+		{ PADDING, 100 },
+		{ 0,0 },
+		"Instructions for Blackjack \n Please visit Wikipedia for rules \nhttps://en.wikipedia.org/wiki/Blackjack"
+	};
+
+	GameRender::PrintText(&txtInstructions);
 
 	// show buttons
-	GameRender::DrawElement(btnStart, { SCREEN_WIDTH / 4 - START_MENU_BUTTON_SIZE.width / 2, 400 });
-	GameRender::DrawElement(btnQuit, { SCREEN_WIDTH / 4 - START_MENU_BUTTON_SIZE.width / 2, btnStart->getYPos() + START_MENU_BUTTON_SIZE.height + LINE_HEIGHT } );
+	btnStart.position = { SCREEN_WIDTH / 4 - START_MENU_BUTTON_SIZE.width / 2, 400 };
+	GameRender::DrawElement(&btnStart);
+	btnQuit.position = { SCREEN_WIDTH / 4 - START_MENU_BUTTON_SIZE.width / 2, (btnStart.image)->getYPos() + START_MENU_BUTTON_SIZE.height + LINE_HEIGHT };
+	GameRender::DrawElement(&btnQuit);
 }
 
+void LoadGameOver()
+{
+	GameRender::ClearScreen();
+
+	Textbox txtGameOver
+	{
+		"txtGameOver",
+		{ PADDING, 100 },
+		{ 0,0 },
+		"Thanks for Playing"
+	};
+
+	GameRender::PrintText(&txtGameOver);
+
+	Sleep(6000);
+
+	GameRender::Finish();
+}
 

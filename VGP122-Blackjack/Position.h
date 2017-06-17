@@ -64,6 +64,7 @@ struct Position
 		yPos = rhs.yPos;
 		return *this;
 	}
+
 	friend bool operator==(const Position & lhs, const Position & rhs)
 	{
 		if (lhs.xPos == rhs.xPos && lhs.yPos == rhs.yPos)
