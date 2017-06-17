@@ -84,19 +84,19 @@ void Player::SetHandScore(int score, int hand)
 
 void Player::ViewSingleHand(int hand, bool showHandNumber)
 {
-	/*int i{ 0 };
-		cout << "--------- Hand " << (showHandNumber ? to_string(hand + 1) + " " : "--") << "--------" << endl;
-		for (Card card : hands[hand])
+	int i{ 0 };
+	cout << "--------- Hand " << (showHandNumber ? to_string(hand + 1) + " " : "--") << "--------" << endl;
+	for (Card card : hands[hand])
+	{
+		if (card.GetFaceUp())
 		{
-			if (card.GetFaceUp())
-			{
-				card.ViewCard();
-			}
-			else
-			{
-				cout << "<< Card is hidden >>" << endl;
-			}
-		}*/
+			card.ViewCard();
+		}
+		else
+		{
+			cout << "<< Card is hidden >>" << endl;
+		}
+	}
 }
 
 void Player::FinishRound()

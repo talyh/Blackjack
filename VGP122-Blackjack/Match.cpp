@@ -250,10 +250,6 @@ void Match::PlayRound()
 		// if any of the players got a natural blackjack, jump to Finish Round
 		if (CheckPlayerCards(&dealer, &beginningRound) == 2 || CheckPlayerCards(&player, &beginningRound) == 2)
 		{
-			txtMessage.value = "21 !";
-			
-			Sleep(1500);
-
 			// finish round
 			FinishRound();
 		}	
@@ -269,8 +265,6 @@ void Match::PlayRound()
 			{
 				LetHousePlay();
 			}
-
-			Sleep(3000);
 
 			// finish round
 			FinishRound();
@@ -307,24 +301,10 @@ void Match::RedrawTable()
 	
 	if (playing)
 	{
-		if (player.GetSecondHandStatus())
+		if (player.GetFirstHandStatus())
 		{
 			GameRender::DrawElement(&btnHit);
 			GameRender::DrawElement(&btnStay);
-		}
-		
-		if (beginningRound)
-		{
-			GameRender::DrawElement(&btnDoubleDown, false);
-			if (player.GetSplitable())
-			{
-				GameRender::DrawElement(&btnSplit, false);
-			}
-			if (dealer.GetHandRisk())
-			{
-				GameRender::DrawElement(&btnSurrender, false);
-				// TODO - add call to insurance
-			}
 		}
 
 		if (player.GetHands().size() > 1 && player.GetSecondHandStatus())
@@ -332,33 +312,17 @@ void Match::RedrawTable()
 			GameRender::DrawElement(&btnHit2);
 			GameRender::DrawElement(&btnStay2);
 		}
-
-		for (Player* player : players)
-		{
-			for (vector<Card> hand : player->GetHands())
-			{
-				int i{ 1 };
-				for (Card card : hand)
-				{
-					GameRender::DrawElement(&card, (player->GetType() == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * i));
-					i++;
-				}
-			}
-		}
 	}
 
-	if (finishedRound)
+	for (Player* player : players)
 	{
-		for (Player* player : players)
+		for (vector<Card> hand : player->GetHands())
 		{
-			for (vector<Card> hand : player->GetHands())
+			int i{ 1 };
+			for (Card card : hand)
 			{
-				int i{ 1 };
-				for (Card card : hand)
-				{
-					GameRender::DrawElement(&card, (player->GetType() == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * i));
-					i++;
-				}
+				GameRender::DrawElement(&card, (player->GetType() == "dealer" ? DEALER_HAND_POSITION : PLAYER_HAND_POSITION) + (CARD_PADDING * i));
+				i++;
 			}
 		}
 	}
@@ -503,8 +467,8 @@ void Match::ApplyInsurance()
 	{
 		insuranceApplied = true;
 		insuranceValue = (int)round(bets[0] / 2);
-		cout << "Insurance automatically applied to your bet. Additional " << bets[0] / 2 << " colleted." << endl;
-		cout << "If dealer has a Blackjack, you'll get " << bets[0] << " back." << endl;
+		txtMessage.value = "Insurance automatically applied to your bet. Additional " + to_string(bets[0] / 2)+ " colleted.";
+		txtMessage.value += "If dealer has a Blackjack, you'll get " + to_string(bets[0]) +  " back.";
 	}
 }
 
@@ -534,7 +498,7 @@ void Match::LetHousePlay()
 {
 	dealerPlayed = true;
 	dealer.ShowHiddenCards();
-	
+
 	RedrawTable();
 
 	while (dealer.GetHandScore() < 17)
@@ -545,7 +509,22 @@ void Match::LetHousePlay()
 
 void Match::GetPlay(bool* beginningRound, bool splitable)
 {	
-	RedrawTable();
+	GameRender::DrawElement(&btnHit);
+	GameRender::DrawElement(&btnStay);
+
+	if (beginningRound)
+	{
+		GameRender::DrawElement(&btnDoubleDown, false);
+		if (player.GetSplitable())
+		{
+			GameRender::DrawElement(&btnSplit, false);
+		}
+		if (dealer.GetHandRisk())
+		{
+			GameRender::DrawElement(&btnSurrender, false);
+			ApplyInsurance();
+		}
+	}
 
 	bool listening = true;
 	while (listening)
@@ -677,7 +656,15 @@ void Match::FinishRound(bool surrender)
 {
 	if (!surrender)
 	{
+		Sleep(1500);
 		dealer.ShowHiddenCards();
+		
+		/* --------------------- DEBUG ------------------------*/
+		cout << "Dealer's Hand" << endl;
+		dealer.ViewSingleHand();
+		cout << "Score: " << dealer.GetHandScore() << endl;
+		/* --------------------------------------------------- */
+
 		RedrawTable();
 
 		int i{ 0 };
@@ -745,6 +732,8 @@ void Match::FinishRound(bool surrender)
 	finishedRound = true;
 	insuranceApplied = false;
 	txtMessage.value = "";
+
+	Sleep(1500);
 }
 
 void Match::FinishGame()

@@ -64,7 +64,7 @@ public:
 	
 	static const int numberOfPlayers{ 2 };
 
-	const int initialBet { 490 };
+	const int initialBet { 10 };
 	const int betIncrement { 10 };
 
 private:	
