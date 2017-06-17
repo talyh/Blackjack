@@ -29,8 +29,6 @@ public:
 
 	void GetBet();
 
-	void OfferSurrender();
-
 	void ApplyInsurance();
 
 	void LetPlayerPlay(bool* all21, bool* allBusted);

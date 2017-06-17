@@ -56,8 +56,8 @@ const string BTN_DOUBLE_DOWN_IMAGE = "imgs/btnDoubleDown.png";
 const string BTN_DOUBLE_DOWN_TOOLTIP = "imgs/btnDoubleDownTooltip.png";
 const string BTN_SURRENDER_IMAGE = "imgs/btnSurrender.png";
 const string BTN_SURRENDER_TOOLTIP = "imgs/btnSurrenderTooltip.png";
-const string BTN_YES_IMAGE = "imgs/btnConfirm.png";
-const string BTN_NO_IMAGE = "imgs/btnPass.png";
+const string BTN_INSURANCE_IMAGE = "imgs/btnInsurance.png";
+const string BTN_INSURANCE_TOOLTIP = "imgs/btnInsuranceTooltip.png";
 const string CARDS_IMAGE = "imgs/cards.png";
 const string CARD_BACK_IMAGE = "imgs/cardBack.png";
 // audio
